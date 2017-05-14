@@ -7,11 +7,7 @@
     <bookmark url="file://$PROJECT_DIR$/modules/administration/sub_templates/admin_vrabote_parser/parser/vrabote_parser.php" line="219" mnemonic="O" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a4bdaf9f-7291-435a-bf25-79f33781bc24" name="Default" comment="test">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/mbcms" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-    </list>
+    <list default="true" id="a4bdaf9f-7291-435a-bf25-79f33781bc24" name="Default" comment="test" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -568,7 +564,7 @@
       <workItem from="1494764392205" duration="1960000" />
       <workItem from="1494766421078" duration="449000" />
       <workItem from="1494768302780" duration="1681000" />
-      <workItem from="1494770103432" duration="716000" />
+      <workItem from="1494770103432" duration="826000" />
     </task>
     <task id="LOCAL-00002" summary="test">
       <created>1494768412896</created>
@@ -676,7 +672,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1150921000" />
+    <option name="totallyTimeSpent" value="1151031000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -688,7 +684,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1366" height="768" extended-state="0" />
+    <frame x="0" y="0" width="1366" height="768" extended-state="1" />
     <layout>
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.32980332" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.59077597" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" x="511" y="47" width="340" height="634" />
