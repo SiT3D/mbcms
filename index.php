@@ -14,4 +14,3 @@ foreach (\Modules::get_main_views() as $view)
 {
     echo \MBCMS\Site\wrapper::propagation($view);
 }
-
