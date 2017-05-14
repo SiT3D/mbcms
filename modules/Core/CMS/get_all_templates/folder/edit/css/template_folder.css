@@ -1,0 +1,46 @@
+.template-folder
+{
+    display: block;
+    padding-top: 10px;
+    height: 40px;
+    font-size: 20px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    color: orange;
+    position: relative;
+}
+
+.template-folder:hover
+{
+    color: gold;
+}
+
+.template-folder .hidden-panel
+{
+    display: none;
+    background: #acf;
+    border-radius: 4px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+}
+
+.template-folder:hover .hidden-panel
+{
+    display: block;
+}
+
+.template-folder .hidden-panel .ico
+{
+    width: 20px;
+    height: 20px;
+    background-size: 15px;
+}
+
+.template-folder .fimage
+{
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+}

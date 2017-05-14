@@ -1,0 +1,53 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 01.12.2016, 18:29:09
+    Author     : user
+*/
+
+
+.fast_edit_form
+{
+    position: fixed;
+    bottom: 12%;
+    width: auto;
+    left: 5px;
+    text-align: left;
+    max-height: 60%;
+    min-height: 200px;
+    overflow: auto;
+    display: inline-block;
+    padding: 10px;
+    padding-right: 100px;
+    padding-bottom: 100px;
+    z-index: 10;
+    font-weight: bold;
+    transition: 1s;
+    background: rgba(200,200,200,0.1);
+}
+
+.fast_edit_form form
+{
+    display: inline-block;
+}
+
+.fast_edit_form .control-label
+{
+    font-weight: bold;
+    font-family: cursive;
+}
+
+.fast_edit_form:hover
+{
+    background: rgba(100,100,200,0.1);
+}
+
+.main_mbcms_form button,
+.fast_edit_form button
+{
+    padding: 10px 20px;
+    cursor: pointer;
+}

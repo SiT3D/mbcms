@@ -1,0 +1,40 @@
+.modules-form
+{
+    
+}
+
+.modules-form .folder
+{
+    cursor: pointer;
+}
+
+.modules-form .folder > .folder
+{
+    margin-left: 20px;
+    position: relative;
+}
+
+.modules-form .folder:before
+{
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background: url('/assets/img/admin/folder-ico.png') center no-repeat;
+    background-size: 20px 20px;
+}
+
+.modules-form .folder .module-in-folder
+{
+    margin-left: 20px;
+    list-style: none;
+}
+
+.modules-form .folder .module-in-folder:hover
+{
+    text-decoration: underline;
+}
+
+

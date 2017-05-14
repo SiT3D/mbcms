@@ -1,0 +1,21 @@
+.mbcms_admin_window
+{
+    height: 99%;
+    padding-top: 1%;
+    /*background: url(../../../ASSETS/img/1pxwindow.png);*/
+    background: #eee;
+    border-left: 1px solid #777;
+    border-right: 1px solid #999;
+    z-index: 100;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow: auto;
+    display: block;
+}
+
+.mbcms_admin_window[close]
+{
+    z-index: 99998;
+    padding-left: 26px;
+}

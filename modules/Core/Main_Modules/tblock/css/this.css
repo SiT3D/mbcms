@@ -1,0 +1,10 @@
+.MBCMS__tblock.this
+{
+    background-color: #fff;
+    width: 100%;
+    width: auto;
+    height: auto;
+    min-height: 100px;
+    display: block;
+    position: relative;
+}

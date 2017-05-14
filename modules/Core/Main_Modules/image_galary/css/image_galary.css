@@ -1,0 +1,88 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 07.02.2017, 22:55:23
+    Author     : sit3d
+*/
+
+.mbcms-image-galary
+{
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+}
+
+.mbcms-image-galary .wrapper
+{
+    flex-grow: 30;
+}
+
+.tags-container
+{
+    margin: 10px 0;
+}
+
+.mbcms-image-galary .galary-content
+{
+    background: #0066CC;
+    min-height: 300px;
+    text-align: left;
+}
+
+.mbcms-image-galary .galary-content h2
+{
+    margin-top: 0;
+}
+
+.tag-name
+{
+    cursor: pointer;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    padding: 3px 5px;
+    box-shadow: 1px 1px 3px rgb(200,200,200);
+    margin-bottom: 7px;
+    display: inline-block;
+}
+
+.mbcms-image-galary .galary-sidebar
+{
+    overflow: auto;
+    padding: 5px;
+    right: 10px;
+    top: 0;
+    background: #51a351;
+    flex-grow:  10;
+    flex-basis: 400px;
+    min-width: 400px;
+}
+
+.mbcms-image-galary .galary-content .galary-one-image
+{
+    max-width: 250px;
+    max-height: 300px;
+    min-height: 200px;
+    position: relative;
+    overflow: auto;
+    background: #fff;
+    padding: 3px;
+    display: inline-block;
+    margin: 3px;
+    margin-bottom: 20px;
+    vertical-align: top;
+}
+
+.mbcms-image-galary .galary-content .galary-one-image img
+{
+    width: 100%;
+    height: auto;
+}
+
+.one-image-name
+{
+    overflow: hidden;
+}

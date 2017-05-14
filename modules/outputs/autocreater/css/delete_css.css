@@ -1,0 +1,14 @@
+.div
+{
+	display: block;
+	margin: 10px;
+	background: #afa;
+}
+
+.span
+{
+	display: inline-block;
+	background: #444;
+	color: #fff;
+	padding: 4px;
+}

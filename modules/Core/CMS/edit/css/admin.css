@@ -1,0 +1,95 @@
+body > .xdebug-var-dump
+{
+    margin-left: 250px;
+}
+
+html, 
+body
+/*.explorer,*/ 
+/*#MBCMS_CONTROLL_TAB_WINDOW,*/
+/*.admin-content вкл только если высота контента меньше чем 100% или перейти на флекс...*/ 
+{
+    height: 100%;
+}
+
+body
+{
+    margin: 0 auto;
+}
+
+.admin-content
+{
+    width: 100%;
+    min-height: 100%;
+    position: relative;
+}
+
+.admin-content .explorer
+{
+    width: 100%;
+    /*overflow: auto;*/
+    display: inline-block;
+    position: relative;
+    z-index: 0;
+}
+
+.standart-window-style
+{
+    background-color: rgba(0,0,0,0.6);
+    border-radius: 4px;
+    border: 1px solid #fff;
+    height: 20%;
+    position: fixed;
+    top: 20%;
+    padding: 20px 5px;
+    color: rgb(255, 255, 255);
+    overflow: hidden;
+    opacity: 1;
+    transition: all 0.3s;
+    transition-delay: 0.2s;
+    width: 20%;
+    opacity: 0.6;
+}
+
+/*еще c для центра*/
+
+.standart-window-style.l 
+{
+    left: 20%;
+}
+
+.standart-window-style.r
+{
+    left: 60%;
+}
+
+.standart-window-style.t
+{
+    top: 20%;
+}
+
+.standart-window-style.b
+{
+    top: 60%;
+}
+
+.standart-window-style.hover:hover
+{
+    transition-delay: 0.3s;
+    height: 60%;
+    top: 20%;
+    width: 40%;
+    z-index: 2;
+    overflow: auto;
+    opacity: 1;
+}
+
+.standart-window-style.hover.l:hover
+{
+    left: 23%;
+}
+
+.standart-window-style.hover.r:hover
+{
+    left: 36%;
+}

@@ -1,0 +1,5 @@
+button.mbcms-bootstrap[disable=true]
+{
+    opacity: 0;
+    margin-left: -100px;
+}

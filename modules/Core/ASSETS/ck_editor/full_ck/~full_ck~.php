@@ -1,0 +1,1 @@
+<div class="bottom_js script"><?php echo $path; ?></div>

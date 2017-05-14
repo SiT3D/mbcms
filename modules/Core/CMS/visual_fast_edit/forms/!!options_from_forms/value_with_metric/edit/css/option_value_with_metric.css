@@ -1,0 +1,68 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 02.12.2016, 19:57:13
+    Author     : user
+*/
+
+.value_with_metric
+{
+    text-align: center;
+}
+
+textarea.value_with_metric.mbcms-bootstrap
+{
+    width: 200px;
+    height: 50px;
+    text-align: left;
+}
+
+.control-group.input-prepend.input-append:focus,
+.control-group.input-prepend.input-append:active
+{
+    outline: none !important;
+}
+
+select[__mousedown],
+.controls
+{
+    position: relative;
+}
+
+.hide_metric[multiple]
+{
+    height: 300px;
+}
+
+.input-mini
+{
+    width: 60px;
+}
+
+.input-small
+{
+    width: 100px;
+}
+
+.input-medium
+{
+    width: 220px;
+}
+
+.input-large
+{
+    width: 300px;
+}
+
+.input-xlarge
+{
+    width: 400px;
+}
+
+.input-xxlarge
+{
+    width: 600px;
+}

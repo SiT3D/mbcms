@@ -1,0 +1,1 @@
+{"$education":{"schooltype":"0","school":"","faculty":"","schoolciteeddy":"","schoolfrom":"2002-02-01","schoolto":"2010-04-01","schooldescription":"","resumeid":4352},"$resume_id":4352}

@@ -1,0 +1,20 @@
+.standart-settings
+{
+    
+}
+
+.standart-settings .settings-editor-info-module
+{
+    display: inline-block;
+    margin: 0 30px 30px 0;
+}
+
+.controll-panel
+{
+    position: fixed;
+    z-index: inherit;
+    top: 0;
+    left: inherit;
+    padding: 8px;
+    background: inherit;
+}

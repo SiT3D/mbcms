@@ -1,0 +1,60 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 29.01.2017, 18:18:51
+    Author     : sit3d
+*/
+
+.mbcms-form textarea
+{
+    width: 500px;
+    height: 120px;
+}
+
+form[order=horizont] div
+{
+    display: inline-block;
+}
+
+form[order=vertical]
+{
+    display: block;
+}
+
+form[order=vertical] label
+{
+    padding-top: 15px;
+    margin-bottom: 4px;
+    display: block;
+    height: 0;
+}
+
+.mbcms-form .chosen-choices,
+.mbcms-form .chosen-container,
+.mbcms-form input[name]:not([type=submit]),
+.mbcms-form input[name]:not([type=checkbox]),
+.mbcms-form select
+{
+    min-width: 240px;
+}
+
+.mbcms-form [type=submit]
+{
+    margin-top: 40px;
+}
+
+.mbcms-form button
+{
+    margin: 10px 20px;
+}
+
+@media screen and (max-width: 400px)
+{
+    .mbcms-form textarea
+    {
+        width: 100%;
+    }
+}

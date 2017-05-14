@@ -1,0 +1,63 @@
+
+.visual_fast_edit__border-style
+{
+    position: fixed;
+}
+
+.visual_fast_edit__border-color
+{
+    z-index: 1;
+}
+
+.visual_fast_edit__border-style.left
+{
+    width: 2%;
+    height: 30%;
+    left: 40%;
+    top: 50%;
+}
+
+.visual_fast_edit__border-style.right
+{
+    width: 2%;
+    height: 30%;
+    left: 70%;
+    top: 50%;
+}
+
+.visual_fast_edit__border-color.right,
+.visual_fast_edit__border-color.left
+{
+    position: relative;
+    top: 30%;
+    left: -7px;
+}
+
+.visual_fast_edit__border-color.right
+{
+    left: 3px;
+}
+
+.visual_fast_edit__border-style.top
+{
+    width: 30%;
+    height: 2%;
+    left: 40%;
+    top: 45%;
+}
+
+.visual_fast_edit__border-style.bottom
+{
+    width: 30%;
+    height: 2%;
+    left: 40%;
+    top: 80%;
+}
+
+.visual_fast_edit__border-color.bottom,
+.visual_fast_edit__border-color.top
+{
+    left: 60%;
+    top: -4px;
+    position: relative;
+}

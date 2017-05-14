@@ -1,0 +1,30 @@
+.clear
+{
+    clear: both;
+}
+
+
+.float-left
+{
+    float: left;
+}
+
+.float-right
+{
+    float: right;
+}
+
+.block
+{
+    display: block;
+}
+
+.inline-block
+{
+    display: inline-block;
+}
+
+.z102
+{
+    z-index: 102 !important; 
+}

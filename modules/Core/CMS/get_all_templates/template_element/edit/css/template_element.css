@@ -1,0 +1,81 @@
+
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .href
+{
+    cursor: pointer;
+    transition: 0.3s;
+    color: #000;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul
+{
+    position: relative;
+    cursor: pointer;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul .hidden-panel
+{
+    background: #acf;
+    border-radius: 5px;
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    opacity: 1;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul:hover .hidden-panel
+{
+    display: block;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .href:hover
+{
+    color: gold;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul
+{
+    margin-bottom: 10px;
+    position: relative;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul .comment
+{
+    display: block;
+    width: 50%;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    opacity: 0.5;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul .comment:hover
+{
+    opacity: 1;
+}
+
+.this-is-template-title
+{
+    color: orange;
+}
+
+.this-is-template-title:hover
+{
+    color: gold;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul .hidden-panel
+{
+    position: absolute;
+    left: 50%;
+    top: -1px;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES .boxes-right-ul .hidden-panel .ico
+{
+    width: 20px;
+    height: 20px;
+    background-size: 16px;
+}

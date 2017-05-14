@@ -1,0 +1,163 @@
+.MBCMS_MY_MODULE_TAKE
+{
+    display: block;
+    border-bottom: 3px solid #ddd;
+    border-right: 3px solid #ddd;
+    padding-left: 5px;
+    width: 95%;
+    margin-top: 10px;
+    position: relative;
+    padding-bottom: 2%;
+    padding-left: 2%;
+    transition: background-color 2s;
+    border-radius: 12px;
+}
+
+.fixed-controll-panel
+{
+    position: fixed;
+    left: inherit;
+    top: 0;
+    z-index: inherit;
+    background: #fff;
+    height: 25px;
+    padding-top: 5px;
+    margin-left: 5px;
+}
+
+.MBCMS_MY_MODULE_TAKE.compact
+{
+    background: #efefef;
+    position: relative;
+}
+
+.MBCMS_MY_MODULE_TAKE .arrow
+{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-size: cover;
+    position: absolute;
+    left: 100%;
+    margin-left: -50px;
+    top: 16px;
+    transition: transform 1s;
+}
+
+.MBCMS_MY_MODULE_TAKE.compact .arrow
+{
+    transform: rotate(-540deg);
+}
+
+.MBCMS_MY_MODULE_TAKE.compact .informator
+{
+    display: inline-block;
+    width: 20%;
+    margin-left: 20px;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    position: absolute;
+    height: 54px;
+    overflow: hidden;
+    top: 8px;
+    padding-left: 20px;
+}
+
+.MBCMS_MY_MODULE_TAKE.compact .informator:hover
+{
+    height: auto;
+    width: 50%;
+    min-height: 54px;
+    z-index: 10;
+    background: #aaa;
+    border-radius: 10px;
+    border: 1px solid #999;
+    cursor: pointer;
+}
+
+.MBCMS_MY_MODULE_TAKE .options-finder
+{
+    margin-left: 20px;
+}
+
+.MBCMS_MY_MODULE_TAKE #select_position
+{
+    margin-bottom: 30px;
+}
+
+.MBCMS_MY_MODULE_TAKE label
+{
+    width: 100%;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 3px;
+}
+
+.MBCMS_MY_MODULE_TAKE .take-title
+{
+    display: inline-block;
+}
+
+.MBCMS_MY_MODULE_TAKE .ico:NOT(.not-standart)
+{
+    width: 30px;
+    height: 30px;
+    margin-right: 6px;
+    background-size: 20px !important;
+    border-radius: 5px;
+    border: 1px solid #555;
+    position: absolute;
+    left: 100%;
+    margin-left: -150px;
+    top: 16px;
+    transition: border-radius 0.25s, background-color 1s;
+    cursor: pointer;
+}
+
+.MBCMS_MY_MODULE_TAKE .ico:active,
+.MBCMS_MY_MODULE_TAKE .ico:focus
+{
+    outline: none;
+}
+
+.MBCMS_MY_MODULE_TAKE .ico:NOT(.not-standart):hover
+{
+    background-color: orange !important;
+    border-radius: 50%;
+    background-position: center;
+}
+
+.MBCMS_MY_MODULE_TAKE .ico.del
+{
+    margin-left: -250px;
+}
+
+.MBCMS_MY_MODULE_TAKE .ico.clone
+{
+    margin-left: -210px;
+}
+
+.MBCMS_MY_MODULE_TAKE .ico.move-down
+{
+    margin-left: -170px;
+}
+
+.MBCMS_MY_MODULE_TAKE .ico.move
+{
+    margin-left: -130px;
+    cursor: move;
+}
+
+.MBCMS_MY_MODULE_TAKE .settings-editor-info-module[mtype="mtext"] textarea
+{
+    width: 100%;
+    height: 120px;
+}
+
+.MBCMS_MY_MODULE_TAKE .settings-editor-info-module
+{
+    display: inline-block;
+    margin-right: 30px;
+    margin-bottom: 30px;
+    vertical-align: top;
+}

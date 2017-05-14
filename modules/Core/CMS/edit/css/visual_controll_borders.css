@@ -1,0 +1,159 @@
+
+
+#MBCMS_CONTROLL_TAB_WINDOW .visual-border
+{
+    position: absolute;
+    background: #7cc1f0;
+    z-index: 99990;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .visual-border.ll-border
+{
+    width: 1px;
+    height: 100%;
+    border-right: 1px solid #5cb1c0;
+    top: 0;
+    left: 0;
+    cursor: e-resize;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .visual-border.rl-border
+{
+    width: 1px;
+    height: 100%;
+    border-left: 1px solid #5cb1c0;
+    top: 0;
+    left: 100%;
+    margin-left: -2px;
+    cursor: e-resize;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .visual-border.tl-border
+{
+    width: 100%;
+    height: 1px;
+    border-bottom: 1px solid #5cb1c0;
+    top: 0;
+    left: 0;
+    cursor: n-resize;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .visual-border.bl-border
+{
+    width: 100%;
+    height: 1px;
+    border-top: 1px solid #5cb1c0;
+    top: 100%;
+    left: 0;
+    margin-top: -2px;
+    cursor: n-resize;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .visual-circle
+{
+    background: #fff;
+    width: 6px;
+    height: 6px;
+    border: 1px solid lightblue;
+    position: absolute;
+    border-radius: 50%;
+    z-index: 99999;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .tlc-circle.visual-circle
+{
+    top: 0;
+    left: 0;
+    margin-top: -3px;
+    margin-left: -3px;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .mlc-circle.visual-circle
+{
+    top: 50%;
+    left: 0;
+    margin-top: -3px;
+    margin-left: -3px;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .blc-circle.visual-circle
+{
+    top: 100%;
+    left: 0;
+    margin-top: -5px;
+    margin-left: -3px;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .trc-circle.visual-circle
+{
+    top: 0;
+    left: 100%;
+    margin-top: -3px;
+    margin-left: -5px;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .mrc-circle.visual-circle
+{
+    top: 50%;
+    left: 100%;
+    margin-top: -3px;
+    margin-left: -5px;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .brc-circle.visual-circle
+{
+    top: 100%;
+    left: 100%;
+    margin-top: -5px;
+    margin-left: -5px;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .mtc-circle.visual-circle
+{
+    top: 0;
+    left: 50%;
+    margin-top: -3px;
+    margin-left: -3px;
+}
+
+#MBCMS_CONTROLL_TAB_WINDOW .mbc-circle.visual-circle
+{
+    top: 100%;
+    left: 50%;
+    margin-top: -5px;
+    margin-left: -3px;
+}
+
+.relative
+{
+    position: relative;
+}
+
+.__active_visual_blocks_gradient[connect_type]
+{
+    transition: box-shadow 0.8s;
+    transition-delay: 2.2s;
+}
+
+
+.__active_visual_blocks_gradient[connect_type]:hover
+{
+    transition: box-shadow 0s;
+    transition-delay: 0s;
+    cursor: pointer;
+}
+
+[connect_type=__cms_connect_type_OUTPUT].__active_visual_blocks_gradient:hover
+{
+    box-shadow: 0 0 5px 2px #71bdf0 inset, 0 0 9px 2px lightblue inset;
+}
+
+[connect_type=__cms_connect_type_TEMPLATE].__active_visual_blocks_gradient:hover
+{
+    box-shadow: 0 0 5px 2px red inset, 0 0 9px 2px orange inset;
+}
+
+[connect_type=__cms_connect_type_TEMPLATE][__static_view=true].__active_visual_blocks_gradient:hover
+{
+    box-shadow: 0 0 5px 2px lightgreen inset, 0 0 9px 2px green inset;
+}

@@ -1,0 +1,37 @@
+
+.animator-ui-panel
+{
+
+}
+
+.animator-ui-panel .keyframe
+{
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #fff;
+    box-shadow: none;
+}
+
+.not-submit
+{
+    padding: 10px;
+    border-radius: 5px;
+    background: #eee;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.not-submit.active
+{
+    background: green;
+    color: white;
+}
+
+.add_key
+{
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #555;
+}

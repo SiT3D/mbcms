@@ -1,0 +1,307 @@
+.ico
+{
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: inline-block;
+}
+
+.ico.padlock
+{
+    background-image: url(padlock.jpg);
+}
+
+.ico.forms_ico
+{
+    background-image: url(forms_ico.png);
+}
+
+.ico.html_int_ico
+{
+    background-image: url(html_int_ico.png);
+}
+
+.ico.my_image_ico
+{
+    background-image: url(my_image_ico.png);
+}
+
+.ico.menu_ico
+{
+    background-image: url(menu_ico.png);
+}
+
+.ico.database-key-ico
+{
+    background-image: url(database-key-ico.png);
+}
+
+.ico.animator_ico
+{
+    background-image: url(animator_ico.png);
+}
+
+.ico.database_ico
+{
+    background-image: url(database_ico.png);
+}
+
+.ico.css_ico
+{
+    background-image: url(css_ico.png);
+}
+
+.ico.ico_link
+{
+    background-image: url(ico_link.png);
+}
+
+.ico.treangle_deegres
+{
+    background-image: url(treangle_deegres.png);
+}
+
+.ico.standart_no_photo
+{
+    background-image: url(standart_no_photo.png);
+}
+
+.ico.del
+{
+    background-image: url(del.png);
+}
+
+.ico.display_icos
+{
+    background-image: url(display_icos.png);
+}
+
+.margin_4_arrows
+{
+    background-image: url(margin_4_arrows.png);
+    background-size: cover;
+}
+
+.ico.border_ico
+{
+    background-image: url(border_ico.png);
+}
+
+.ico.image_ico
+{
+    background-image: url(image_ico.png);
+}
+
+.ico.add_btn
+{
+    background-image: url(add_btn.png);
+}
+
+.ico.move-up
+{
+    background-image: url(move-up.png);
+}
+
+.ico.move-down
+{
+    background-image: url(move-down.png);
+}
+
+.ico.clone
+{
+    background-image: url(clone.png);
+}
+
+.ico.refresh
+{
+    background-image: url(refresh.png);
+}
+
+.ico.refresh-shadow
+{
+    background-image: url(refresh-shadow.png);
+}
+
+.ico.refresh-my
+{
+    background-image: url(refresh-my.png);
+}
+
+.ico.up-arrow-icon
+{
+    background-image: url(up-arrow-icon.png);
+}
+
+.ico.folder-ico
+{
+    background-image: url(folder-ico.png);
+}
+
+.ico.folder-add
+{
+    background-image: url(folder-add.png);
+}
+
+.ico.text-del
+{
+    background-image: url(text-del.png);
+}
+
+.ico.transfer-document
+{
+    background-image: url(transfer-document.png);
+}
+
+.ico.pen
+{
+    background-image: url(pen.png);
+}
+
+.ico.remove
+{
+    background-image: url(remove.png);
+}
+
+.ico.move
+{
+    background-image: url(move.png);
+}
+
+.ico.move2
+{
+    background-image: url(move2.png);
+}
+
+.ico.view
+{
+    background-image: url(view.png);
+}
+
+.ico.marking-mode
+{
+    background-image: url(icos6_variables.png);
+    background-position: 1px 2px;
+}
+
+.ico.ios_settings
+{
+    background-image: url(ios_settings.png);
+}
+
+.ico.yellow-folder-ico
+{
+    background-image: url(yellow-folder-ico.svg);
+}
+
+.ico.mini-folder-add
+{
+    background-image: url(mini-folder-add.png);
+}
+
+.ico.select-elements
+{
+    background-image: url(select-elements.png);
+}
+
+.ico.select-all-all-elements
+{
+    background-image: url(select-all-all-elements.png);
+}
+
+.ico.unselect-elements
+{
+    background-image: url(unselect-elements.png);
+}
+
+.ico.apple-ico1
+{
+    background-image: url(apple-ico1.png);
+}
+
+.ico.apple-ico2
+{
+    background-image: url(apple-ico2.png);
+}
+
+.ico.apple-ico3
+{
+    background-image: url(apple-ico3.png);
+}
+
+.ico.apple-second-ico1
+{
+    background-image: url(apple-second-ico1.png);
+}
+
+.ico.structure
+{
+    background-image: url(structure.png);
+}
+
+.ico.templates
+{
+    background-image: url(templates.png);
+}
+
+.ico.pages
+{
+    background-image: url(pages.png);
+}
+
+.ico.width_and_height
+{
+    background-image: url(width_and_height.png);
+}
+
+.ico.background
+{
+    background-image: url(background.png);
+}
+
+.pixel_gray_50
+{
+    background-image: url(pixel_gray_50.png);
+}
+
+.rectangle_1_inset
+{
+    background-image: url(rectangle_1_inset.png);
+    background-size: 99% 96%;
+    background-position: center;
+}
+
+.ico.red_cross
+{
+    background-image: url(red_cross.png);
+}
+
+.ico.ico_text
+{
+    background-image: url(ico_text.png);
+}
+
+.ico.margin_arrow
+{
+    background-image: url(margin_arrow.png);
+}
+
+.arrow_block_type
+{
+    background-size: cover;
+    background-image: url(arrow_block_type.png);
+}
+
+.arrow_block_type_down
+{
+    background-size: cover;
+    background-image: url(arrow_block_type_down.png);
+}
+
+.text_block_type
+{
+    background-size: cover;
+    background-image: url(text_block_type.png);
+}

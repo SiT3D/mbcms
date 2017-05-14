@@ -1,0 +1,30 @@
+
+
+#images_galary
+{
+    position: fixed;
+    width: 94%;
+    height: 94%;
+    background: rgba(0,0,0,0.3);
+    left: 0;
+    top: 0;
+    padding: 3%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+#images_galary img
+{
+    background: #fff;
+    border: 1px solid #000;
+    cursor: pointer;
+    transition: all 0.8s;
+}
+
+#images_galary img:hover
+{
+    background: green;
+    zoom: 1.2;
+}
+

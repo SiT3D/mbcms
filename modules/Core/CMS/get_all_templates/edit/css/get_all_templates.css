@@ -1,0 +1,41 @@
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULE.templates
+{
+    padding-bottom: 60px;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULE.templates .boxes-right-ul
+{
+    
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULE.templates .boxes-right-ul .mcheb,
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULE.templates .boxes-right-ul .boxes-li
+{
+    display: inline-block;
+    vertical-align: top;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULE.template-finder
+{
+    margin-left: 20px;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULE .ico.folder-add
+{
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    background-size: cover;
+}
+
+#MBCMS_MAIN_TEMPLATES_TAB_CREATE_MODULES
+{
+    margin-top: 30px;
+}
+
+.ie.folder.cont-fold
+{
+    padding: 0;
+    margin: 0;
+}
