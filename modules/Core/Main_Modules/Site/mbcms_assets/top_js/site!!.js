@@ -16,7 +16,8 @@ site.configuration = undefined;
 site.ajax = function (ajaxOb)
 {
     ajaxOb.url = ajaxOb.url || '/ajax';
-    ajaxOb.method = ajaxOb.method || 'GET';
+    ajaxOb.method = ajaxOb.method || 'POST';
+    ajaxOb.method = site.is_static_templates() ? ajaxOb.method : 'GET';
     ajaxOb.success = ajaxOb.success || function(msg){get_req(msg)};
 
     $.ajax(ajaxOb);
