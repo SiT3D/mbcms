@@ -95,9 +95,12 @@ class image_galary extends \Module implements \adminAjax
                 'DISTINCT t_images.id',
                 't_images_tags.image_id',
                 't_images.*',
-                "group_concat(t_images_tags.value separator ',') as mytags",
-                "group_concat(t_images_tags.id separator ',') as mytags_ids",
+                "group_concat(TT.value) as mytags",
+                'group_concat(TT.id) as mytags_ids'
             ]);
+
+            $query->j('(SELECT * FROM t_images_tags) AS TT', 'TT.image_id = t_images.id');
+            $query->w('TT.name = ?', 'tag');
 
             $query->wc('L', 'AND');
             foreach ($filters as $filter)
@@ -123,7 +126,8 @@ class image_galary extends \Module implements \adminAjax
         }
 
         $query->g('t_images.id');
-        $query->lj('t_images_tags', "t_images_tags.image_id = t_images.id AND t_images_tags.name = ?", 'tag');
+        $query->lj('t_images_tags', "t_images_tags.image_id = t_images.id");
+        $query->w('t_images_tags.name = ?', 'tag');
     }
 
     private function __tags()
