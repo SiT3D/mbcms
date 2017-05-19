@@ -264,7 +264,7 @@ mbcms.visual_fast_edit.main_option.__get_complex_value = function (trg)
     }
 };
 
-(function ()
+new event.site.load().listen(function ()
 {
     new event.shortkey.keydown().listen(function ()
     {
@@ -306,83 +306,83 @@ mbcms.visual_fast_edit.main_option.__get_complex_value = function (trg)
     });
 
 
-})();
-
-
-new event.visual_fast_edit.init().listen(function ()
-{
-    var $this = this;
-    ck_editor.init(this.jq_container);
-    var txar = $this.jq_container.find('textarea');
-    var id = txar.attr('id');
-
-    if (txar.length)
+    new event.visual_fast_edit.init().listen(function ()
     {
-        setTimeout(function ()
+        var $this = this;
+        ck_editor.init(this.jq_container);
+        var txar = $this.jq_container.find('textarea');
+        var id = txar.attr('id');
+
+        if (txar.length)
         {
-            try
+            setTimeout(function ()
             {
-                CKEDITOR.instances[id]
-                    .on('change', function ()
-                    {
-                        mbcms.visual_fast_edit.main_option.dynamic_go(txar);
-                    });
-            }
-            catch (e)
-            {
-
-            }
-
-        }, 500)
-    }
-
-
-    var data = mbcms.visual_fast_edit.get_current_data();
-    var key = $this.jq_container
-        .find('[colorpicker]').attr('__ov');
-
-    key = key ? key.replace('_', '-') : '';
-
-    if (key)
-    {
-        $this.jq_container
-            .find('[colorpicker]')
-            .css({
-                width: 20,
-                background: data.this.css(key),
-                color: data.this.css(key),
-                cursor: 'pointer'
-            })
-            .colorpicker
-            (
+                try
                 {
-                    parts: 'full',
-                    alpha: true,
-                    colorFormat: 'RGBA',
-                    ok: function (a, b)
-                    {
-                        mbcms.visual_fast_edit.get_targets(data).css(key, b.formatted);
-                        $this.jq_container
-                            .find('[colorpicker]')
-                            .css({
-                                background: b.formatted,
-                                color: b.formatted
-                            });
-                    },
-                    select: function (a, b)
-                    {
-                        mbcms.visual_fast_edit.get_targets(data).css(key, b.formatted);
-                        $this.jq_container
-                            .find('[colorpicker]')
-                            .css({
-                                background: b.formatted,
-                                color: b.formatted
-                            });
-                    }
+                    CKEDITOR.instances[id]
+                        .on('change', function ()
+                        {
+                            mbcms.visual_fast_edit.main_option.dynamic_go(txar);
+                        });
                 }
-            )
-        ;
-    }
+                catch (e)
+                {
+
+                }
+
+            }, 500)
+        }
+
+
+        var data = mbcms.visual_fast_edit.get_current_data();
+        var key = $this.jq_container
+            .find('[colorpicker]').attr('__ov');
+
+        key = key ? key.replace('_', '-') : '';
+
+        if (key)
+        {
+            $this.jq_container
+                .find('[colorpicker]')
+                .css({
+                    width: 20,
+                    background: data.this.css(key),
+                    color: data.this.css(key),
+                    cursor: 'pointer'
+                })
+                .colorpicker
+                (
+                    {
+                        parts: 'full',
+                        alpha: true,
+                        colorFormat: 'RGBA',
+                        ok: function (a, b)
+                        {
+                            mbcms.visual_fast_edit.get_targets(data).css(key, b.formatted);
+                            $this.jq_container
+                                .find('[colorpicker]')
+                                .css({
+                                    background: b.formatted,
+                                    color: b.formatted
+                                });
+                        },
+                        select: function (a, b)
+                        {
+                            mbcms.visual_fast_edit.get_targets(data).css(key, b.formatted);
+                            $this.jq_container
+                                .find('[colorpicker]')
+                                .css({
+                                    background: b.formatted,
+                                    color: b.formatted
+                                });
+                        }
+                    }
+                )
+            ;
+        }
+
+
+    });
 
 
 });
