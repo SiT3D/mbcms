@@ -17,7 +17,6 @@ site.ajax = function (ajaxOb)
 {
     ajaxOb.url = ajaxOb.url || '/ajax';
     ajaxOb.method = ajaxOb.method || 'POST';
-    ajaxOb.method = site.is_static_templates() ? ajaxOb.method : 'GET';
     ajaxOb.success = ajaxOb.success || function(msg){get_req(msg)};
 
     $.ajax(ajaxOb);
@@ -42,6 +41,7 @@ site.ajaxf = function (ajaxOb, form)
 
     $.ajax(ajaxOb);
 };
+
 
 site.is_static_templates = function ()
 {
