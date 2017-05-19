@@ -1,7 +1,8 @@
 /modules/Core/CMS/files/jsons/*
 /modules/STANDART/templates/*
-/templates/*
+/modules/templates/*
 /im/
 /media/
 /cache/
 /.idea/
+/modules/Core/configuration/*

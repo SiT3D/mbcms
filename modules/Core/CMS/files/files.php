@@ -83,7 +83,8 @@ class files
     {
         if (file_exists($filename))
         {
-            return json_decode(file_get_contents($filename), $assoc);
+            $result = json_decode(file_get_contents($filename), $assoc);
+            return $result ? $result : [];
         }
 
         return $assoc ? [] : new \stdClass();

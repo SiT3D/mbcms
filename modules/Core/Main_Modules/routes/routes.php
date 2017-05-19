@@ -20,7 +20,10 @@ class routes extends \Module
     {
         if (!self::$__all_pages)
         {
+            $standart_pages = files::get_json(files::PATH_STANDART_PAGES);
             self::$__all_pages = files::get_json(files::PATH_PAGES);
+            self::$__all_pages = array_merge((array) $standart_pages, (array) self::$__all_pages);
+            self::$__all_pages = (object) self::$__all_pages;
         }
 
         $adr = self::__get_url_adr();
