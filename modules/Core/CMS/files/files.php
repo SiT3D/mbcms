@@ -5,11 +5,12 @@ namespace MBCMS;
 class files
 {
 
-    const PATH_CLASSES = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'classes.json';
-    const PATH_PAGES = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'pages.json';
-    const PATH_FOLDERS = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'folders.json';
+    const PATH_CLASSES        = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'classes.json';
+    const PATH_PAGES          = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'pages.json';
+    const PATH_STANDART_PAGES = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'standartPages.json';
+    const PATH_FOLDERS        = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'folders.json';
 
-    public static $all_files = [''];
+    public static  $all_files     = [''];
     private static $upload_errors = ['ext' => [], 'size' => []];
 
     /**
@@ -76,6 +77,7 @@ class files
      *
      * @param $filename
      * @param $assoc is array if true else object
+     * @return array|mixed|\stdClass
      */
     static function get_json($filename, $assoc = false)
     {
@@ -113,7 +115,7 @@ class files
     static function upload($path, $key = 'file', $white_extensions = [], $max_size = 1024 * 1024 * 100)
     {
         $pathes = [];
-        $path = preg_replace_callback('~/$~', function ()
+        $path   = preg_replace_callback('~/$~', function ()
         {
             return '';
         }, $path);
@@ -132,7 +134,7 @@ class files
                 {
                     $tmp_name = $_FILES[$key]["tmp_name"][$index];
                     $filename = trim(basename($_FILES[$key]["name"][$index]));
-                    $ext = self::__get_extension($filename);
+                    $ext      = self::__get_extension($filename);
 
                     if (!self::__valid_ext($ext, $white_extensions))
                     {
@@ -162,11 +164,12 @@ class files
             {
                 $tmp_name = $_FILES[$key]["tmp_name"];
                 $filename = trim(basename($_FILES[$key]["name"]));
-                $ext = self::__get_extension(basename($_FILES[$key]["name"]));
+                $ext      = self::__get_extension(basename($_FILES[$key]["name"]));
 
                 if (!self::__valid_ext($ext, $white_extensions))
                 {
                     self::$upload_errors['ext'][$filename] = $white_extensions;
+
                     return [];
                 }
 
@@ -175,6 +178,7 @@ class files
                 if ($filesize > $max_size)
                 {
                     self::$upload_errors['size'][$filename] = [$filesize, $max_size];
+
                     return [];
                 }
 
@@ -188,30 +192,22 @@ class files
         return $pathes;
     }
 
-    /**
-     * @return array
-     */
-    public static function get_upload_errors()
-    {
-        return self::$upload_errors;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function is_upload_errors()
-    {
-        if (count(self::$upload_errors['ext']) || count(self::$upload_errors['size']))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     private static function __get_extension($filename)
     {
         return files::get_extension($filename);
+    }
+
+    /**
+     *
+     * @param $filename
+     * @return string
+     */
+    public
+    static function get_extension($filename)
+    {
+        $info = new \SplFileInfo($filename);
+
+        return $info->getExtension();
     }
 
     private static function __valid_ext($ext, $white_list)
@@ -238,7 +234,7 @@ class files
     static function create_path_dirs($global_path, $start_path = '')
     {
         $global_path = str_replace(HOME_PATH, '', $global_path);
-        $pieces = explode(DIRECTORY_SEPARATOR, $global_path);
+        $pieces      = explode(DIRECTORY_SEPARATOR, $global_path);
         array_pop($pieces);
         $current_path = $start_path;
 
@@ -255,18 +251,28 @@ class files
     }
 
     /**
-     *
-     * @param $filename
+     * @return array
      */
-    public
-    static function get_extension($filename)
+    public static function get_upload_errors()
     {
-        $info = new \SplFileInfo($filename);
-        return $info->getExtension();
+        return self::$upload_errors;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function is_upload_errors()
+    {
+        if (count(self::$upload_errors['ext']) || count(self::$upload_errors['size']))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public
-    static function get_files_in_dir($dir, $etc = '') 
+    static function get_files_in_dir($dir, $etc = '')
     {
         if (!file_exists($dir))
         {
@@ -274,7 +280,7 @@ class files
         }
 
         $find = false;
-        
+
         for ($i = 0; $i < count(self::$all_files); $i++)
         {
             if (self::$all_files[$i] == $dir)
@@ -283,7 +289,7 @@ class files
                 break;
             }
         }
-        
+
         if (!$find)
         {
             self::$all_files[] = $dir;
@@ -303,6 +309,7 @@ class files
 
                 closedir($handle);
             }
+
             return $a;
         }
         else
