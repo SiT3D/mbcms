@@ -254,6 +254,7 @@ if (typeof mbcms !== 'undefined')
     /**
      *
      * @param {type} ajaxData /// example {type: 'POST', data: {}, success: function(){}}
+     * @param adm_status
      * @returns {undefined}
      */
     mbcms.ajax = function (ajaxData, adm_status)
@@ -337,23 +338,13 @@ function __delay(obj, key, time, callback)
 
     obj[key] = setTimeout(callback, time);
 }
-;
 
-
-(function ($)
+function is_admin()
 {
-    $.fn.getAttributes = function ()
+    if (typeof mbcms != 'undefined')
     {
-        var attributes = {};
+        return true;
+    }
 
-        if (this.length)
-        {
-            $.each(this[0].attributes, function (index, attr)
-            {
-                attributes[attr.name] = attr.value;
-            });
-        }
-
-        return attributes;
-    };
-})(jQuery);
+    return false;
+}
