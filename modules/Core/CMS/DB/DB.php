@@ -654,13 +654,9 @@ class DB
         {
             $er = $this->__mysqli->error ? $this->__mysqli->error : 'NO CONNECT. See Database config';
 
-            if (configuration::factory()->is_static_templates())
+            if (configuration::factory()->is_static_templates() !== true)
             {
-                /* MDS_HIDE */
-                echo '<!--';
-            }
-
-            /* MDS */
+                /* MDS */
             echo '<pre class="btn-inverse">';
             echo 'SQL error: ' . $er;
             echo '<br/>';
@@ -668,13 +664,8 @@ class DB
             echo '<br/>';
             echo '======================================================================== ';
             echo '</pre>'; /* MDS */
-
-
-            if (configuration::factory()->is_static_templates())
-            {
-                echo '</pre>';
-                echo '-->'; /* MDS_HIDE */
             }
+
         }
 
         return null;
