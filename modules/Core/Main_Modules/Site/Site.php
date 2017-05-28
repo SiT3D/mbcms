@@ -53,6 +53,7 @@ class Site extends \Module
             $this->json = json_encode([
                 'is_static_templates' => configuration::factory()->is_static_templates(),
                 'idTemplate'          => routes::get_current_idTemplate(),
+                'is_admin'            => configuration::factory()->is_superadmin(),
             ]);
         }
 

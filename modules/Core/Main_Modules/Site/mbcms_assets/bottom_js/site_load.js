@@ -11,13 +11,15 @@ new event.site.load().listen(function ()
     }
 
 
-    if (site.configuration.is_static_templates == 'live')
+    if (site.configuration.is_static_templates == 'live' && site.configuration.is_admin)
     {
         $(document)
             .keydown(function (e)
             {
                 if (e.keyCode == KEY_F5 && !e.ctrlKey)
                 {
+                    site.messages.factory('reload_and_generate_template').create().append_content('Обновляю страницу').locked(true);
+
                     site.ajax(
                         {
                             data: {
@@ -26,7 +28,10 @@ new event.site.load().listen(function ()
                             },
                             success: function ()
                             {
-                                location.reload();
+                                __delay(this, 'lulgeneratecontentreloaded', 200, function()
+                                {
+                                    location.reload();
+                                });
                             }
                         }
                     );
@@ -34,6 +39,8 @@ new event.site.load().listen(function ()
                 }
                 else if (e.keyCode == KEY_F5 && e.ctrlKey)
                 {
+                    site.messages.factory('reload_and_generate_template').create().append_content('Переход к тестовому виду').locked(true);
+
                     site.ajax(
                         {
                             data: {
@@ -42,7 +49,10 @@ new event.site.load().listen(function ()
                             },
                             success: function ()
                             {
-                                location.reload();
+                                __delay(this, 'lulgeneratecontentreloaded', 200, function()
+                                {
+                                    location.reload();
+                                });
                             }
                         }
                     );

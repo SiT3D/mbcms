@@ -58,7 +58,7 @@ class cache
     {
         if (self::timer('remove_all_caches_files', 10, self::DAYS))
         {
-            files::remove_dir(self::__dir());
+            files::remove_dir(self::__dir(), 3600 * 24 * 12); // удалить кеш старше 12 дней
         }
     }
 

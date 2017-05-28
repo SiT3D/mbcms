@@ -41,9 +41,13 @@ class files
     /**
      *
      * @param string $path
+     * @param null $oldest_seconds удалять только файлы которые старше (time() - $oldest (seconds))
+     * указывать в секундах.
+     * Пример: 3600 * 24 * 10 - удалит файлы старше 10 дней
      */
-    static function remove_dir($path)
+    static function remove_dir($path, $oldest_seconds = null)
     {
+
         if (preg_match('~/CMS~', $path) || !$path)
         {
             return;
@@ -59,16 +63,26 @@ class files
             return;
         }
 
+        $path = str_replace(['//', '\\\\'], ['/', '\\'], $path);
+
         if (file_exists($path))
         {
-            if (is_file($path))
+            if (is_file($path) && (!$oldest_seconds || ($oldest_seconds && filemtime($path) < time() - $oldest_seconds)))
             {
                 unlink($path);
             }
             else
             {
-                array_map('MBCMS\\files::remove_dir', glob($path . '/*')) == @rmdir($path);
-                @rmdir($path);
+                if ($__pathes = glob($path . '/*'))
+                {
+                    foreach ($__pathes as $item)
+                    {
+                        $times[] = $oldest_seconds;
+                    }
+
+                    array_map('MBCMS\\files::remove_dir', $__pathes, $times);
+                    @rmdir($path);
+                }
             }
         }
     }
@@ -77,14 +91,12 @@ class files
      *
      * @param $filename
      * @param $assoc is array if true else object
-     * @return array|mixed|\stdClass
      */
     static function get_json($filename, $assoc = false)
     {
         if (file_exists($filename))
         {
-            $result = json_decode(file_get_contents($filename), $assoc);
-            return $result ? $result : [];
+            return json_decode(file_get_contents($filename), $assoc);
         }
 
         return $assoc ? [] : new \stdClass();
@@ -201,7 +213,6 @@ class files
     /**
      *
      * @param $filename
-     * @return string
      */
     public
     static function get_extension($filename)
