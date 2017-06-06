@@ -18,7 +18,7 @@ class Module extends Autoload
     public static  $__templates_metr      = 0;
     public static  $__templates_time      = 0;
     public static  $__templates_time_addm = 0;
-    private static $IIIN                  = 3000;
+    private static $IIIN                  = 15000;
     private static $__response            = [];
     /**
      *
@@ -570,13 +570,22 @@ class Module extends Autoload
 
     /**
      * Возвращает массив значений для ajax и убивает  дальнейший вывод die()
+     * @param null $method - если указан метод __METHOD__ проверяет является ли он целью ajax запроса, и только в этом случае вызывает die()
      */
-    public static function response()
+    public static function response($method = null)
     {
         self::$__response['response'] = 'true';
         echo json_encode(self::$__response, JSON_UNESCAPED_UNICODE);
         self::$__response = null;
-        die();
+
+        if ($method && routes::is_target_method($method))
+        {
+            die();
+        }
+        else if ($method === null)
+        {
+            die();
+        }
     }
 
     /**
@@ -587,6 +596,11 @@ class Module extends Autoload
     public static function response_get_key_value($key, $standart = null)
     {
         return isset(self::$__response[$key]) ? self::$__response[$key] : $standart;
+    }
+
+    public static function get_modules_connect_count()
+    {
+        return 15000 - self::$IIIN;
     }
 
     /**
