@@ -2,6 +2,7 @@
 
 namespace MBCMS\image_galary;
 
+use event\image_galary\preUpload;
 use event\image_galary\upload;
 use event\upload_event;
 use MBCMS\block;
@@ -10,6 +11,7 @@ use MBCMS\files;
 use MBCMS\form\form;
 use MBCMS\form\input;
 use MBCMS\image_galary;
+use MBCMS\routes;
 use Plugins\scrollbar;
 use trud\classes\auth;
 
@@ -28,7 +30,9 @@ if (!auth::factory()->admin() && !auth::factory()->user())
 class upload_form extends \MBCMS\block implements \ajax
 {
 
-    private $__multiple = true;
+    private $__with_submit = true;
+    private $__multiple    = true;
+    private $__load_title  = 'Загрузка изображений';
 
     private $__white_list = ['jpg', 'jpeg', 'png'];
     /**
@@ -51,17 +55,27 @@ class upload_form extends \MBCMS\block implements \ajax
     {
         parent::init();
 
-        $this->ADDM(block::factory('Загрузка изображений','h3') ,'modules');
+        $this->ADDM(block::factory($this->__load_title, 'h3'), 'modules');
 
-        $form = form::factory(__CLASS__ . '->upload', 'standart_image_uplouder');
-        $this->ADDM($form, 'modules');
+        if ($this->__with_submit)
+        {
+            $form = form::factory(__CLASS__ . '->upload', 'standart_image_uplouder');
+            $this->ADDM($form, 'modules');
+        }
+        else
+        {
+            $form = $this;
+        }
 
-        $opt = new input('images[]', null, input::TYPE_FILE);
+        $opt           = new input('images[]', null, input::TYPE_FILE);
         $opt->multiple = $this->__multiple;
         $form->ADDM($opt, 'modules');
 
-        $opt = new input('sub', 'Загрузить изображение', input::TYPE_SUBMIT);
-        $form->ADDM($opt, 'modules');
+        if ($this->__with_submit)
+        {
+            $opt = new input('sub', 'Загрузить изображение', input::TYPE_SUBMIT);
+            $form->ADDM($opt, 'modules');
+        }
 
         $this->__user_cms_class = 'upload_form_images';
     }
@@ -73,6 +87,7 @@ class upload_form extends \MBCMS\block implements \ajax
     public function setMultiple($value)
     {
         $this->__multiple = (boolean)$value;
+
         return $this;
     }
 
@@ -81,15 +96,25 @@ class upload_form extends \MBCMS\block implements \ajax
      */
     public function upload()
     {
-        $key = 'images';
+        $key  = 'images';
         $path = HOME_PATH . 'images';
 
 
-        if (!isset($_FILES[$key]["error"]))
+        if (!isset($_FILES[$key]["error"]) || $_FILES[$key]["error"][0] == UPLOAD_ERR_NO_FILE)
         {
             self::add_response('upload_errors[]', 'Файлы отсутствуют');
-            self::response();
+
+            if (routes::is_target_method(__METHOD__))
+            {
+                self::response();
+            }
+            else
+            {
+                return;
+            }
         }
+
+        (new preUpload())->call();
 
         foreach ($_FILES[$key]["error"] as $index => $error)
         {
@@ -97,7 +122,7 @@ class upload_form extends \MBCMS\block implements \ajax
             {
                 $tmp_name = $_FILES[$key]["tmp_name"][$index];
                 $filename = basename($_FILES[$key]["name"][$index]);
-                $ext = files::get_extension($filename);
+                $ext      = files::get_extension($filename);
 
                 if ($this->__valid_ext($ext) && filesize($tmp_name) <= $this->__size)
                 {
@@ -112,6 +137,7 @@ class upload_form extends \MBCMS\block implements \ajax
 
 
                     $image_id = image_galary::factory()->link_image($md5_path, basename($_FILES[$key]["name"][$index]));
+
                     (new upload())
                         ->setImageId($image_id)
                         ->setName(basename($_FILES[$key]["name"][$index]))
@@ -121,8 +147,8 @@ class upload_form extends \MBCMS\block implements \ajax
                 }
                 else
                 {
-                    $__sz = (int) (($this->__size / 1024 / 1024) * 100) / 100;
-                    $sz = (int) ((filesize($tmp_name) / 1024 / 1024) * 100) / 100;
+                    $__sz      = (int)(($this->__size / 1024 / 1024) * 100) / 100;
+                    $sz        = (int)((filesize($tmp_name) / 1024 / 1024) * 100) / 100;
                     $__formats = implode(', ', $this->__white_list);
                     form::errors(['err' => ["Файл должен быть ($__formats) и не должен привышать размер в {$__sz}мб ваш файл: [$ext] " . $sz . 'мб']]);
                 }
@@ -134,12 +160,11 @@ class upload_form extends \MBCMS\block implements \ajax
             }
         }
 
-        self::response();
-    }
 
-    private function __get_md5_path($filename)
-    {
-        return cache::get_md5_path($filename);
+        if (routes::is_target_method(__METHOD__))
+        {
+            self::response();
+        }
     }
 
     private function __valid_ext($ext)
@@ -150,6 +175,38 @@ class upload_form extends \MBCMS\block implements \ajax
         }
 
         return false;
+    }
+
+    private function __get_md5_path($filename)
+    {
+        return cache::get_md5_path($filename);
+    }
+
+    /**
+     * @param string $_load_title
+     * @return $this
+     */
+    public function setLoadTitle($_load_title)
+    {
+        $this->__load_title = $_load_title;
+
+        return $this;
+    }
+
+    /**
+     * Чтобы не размещать форму внутри формы ()
+     *
+     * Если используется такой способ, то в методе к которому обратится форма должна быть запись типа (new image_galary\upload_form())->upload();
+     * Для успешного запуска загрузки и вызова событий загрузки изобюражения!
+     *
+     * @param bool $_with_submit
+     * @return $this
+     */
+    public function setWithSubmit($_with_submit)
+    {
+        $this->__with_submit = $_with_submit;
+
+        return $this;
     }
 
 }
