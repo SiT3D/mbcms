@@ -44,8 +44,7 @@ class image_galary extends \Module implements \adminAjax
         parent::init();
 
 
-        $uploader = new upload_form();
-        $this->ADDM($uploader, 'content');
+        $this->ADDM(new upload_form(), 'content');
 
         $this->__images();
         $this->__tags();
@@ -57,6 +56,7 @@ class image_galary extends \Module implements \adminAjax
         $query = DB::q()
             ->s(['*'], 't_images')
             ->limit(self::COUNT)
+            ->o('t_images.id ASC')
             ->offset(($page - 1) * self::COUNT);
 
         $this->__filter_search($query);
@@ -96,7 +96,7 @@ class image_galary extends \Module implements \adminAjax
                 't_images_tags.image_id',
                 't_images.*',
                 "group_concat(TT.value) as mytags",
-                'group_concat(TT.id) as mytags_ids'
+                'group_concat(TT.id) as mytags_ids',
             ]);
 
             $query->j('(SELECT * FROM t_images_tags) AS TT', 'TT.image_id = t_images.id');
