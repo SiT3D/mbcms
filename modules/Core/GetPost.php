@@ -16,12 +16,13 @@ class GetPost
     static function get($s, $standartValue = null)
     {
         $ret = isset($_POST[$s]) ? $_POST[$s] : null;
+
         if ($ret === null)
         {
             $ret =  isset($_GET[$s]) ? $_GET[$s] : null;
         }
 
-        return $ret == null ? $standartValue : $ret;
+        return $ret ? $ret : $standartValue;
     }
 
     /**
@@ -37,6 +38,7 @@ class GetPost
 
         foreach ($keys as $index => $key)
         {
+
             $standart_value = null;
 
             if (is_string($index))
@@ -96,7 +98,7 @@ class GetPost
             $ret = htmlentities($standartValue);
         }
 
-        return $ret;
+        return $ret ? $ret : $standartValue;
     }
 
     static function isset_key($s)
