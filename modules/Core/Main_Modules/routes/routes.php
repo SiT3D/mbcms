@@ -8,25 +8,22 @@ use GetPost;
 class routes extends \Module
 {
 
-    private static $currentAdr = '';
-    private static $__set_admin = null;
-    private static $__is_static_status = false;
-    private static $__all_pages = [];
-    private static $__url_params = [];
-    private static $__trg_method = '';
+    private static $currentAdr           = '';
+    private static $__set_admin          = null;
+    private static $__is_static_status   = false;
+    private static $__all_pages          = [];
+    private static $__url_params         = [];
+    private static $__trg_method         = '';
     private static $__current_route_name = null;
 
     public static function start()
     {
         if (!self::$__all_pages)
         {
-            $standart_pages = files::get_json(files::PATH_STANDART_PAGES);
             self::$__all_pages = files::get_json(files::PATH_PAGES);
-            self::$__all_pages = array_merge((array) $standart_pages, (array) self::$__all_pages);
-            self::$__all_pages = (object) self::$__all_pages;
         }
 
-        $adr = self::__get_url_adr();
+        $adr              = self::__get_url_adr();
         self::$currentAdr = $adr;
 
         if (self::is_ajax())
@@ -50,18 +47,19 @@ class routes extends \Module
     public static function is_ajax()
     {
         $adr = self::__get_url_adr();
+
         return preg_match('~/ajax$|/ajax\?~', $adr) ? true : false;
     }
 
     private static function ajax_page()
     {
         $className = GetPost::get('class');
-        $redirect = GetPost::get('redirect');
+        $redirect  = GetPost::get('redirect');
 
         $result = [];
         preg_match('~\->(.*)~', $className, $result);
-        $method = isset($result[1]) ? $result[1] : null;
-        $className = preg_replace('~\->(.*)~', '', $className);
+        $method             = isset($result[1]) ? $result[1] : null;
+        $className          = preg_replace('~\->(.*)~', '', $className);
         self::$__trg_method = $method;
 
 
@@ -144,7 +142,7 @@ class routes extends \Module
     }
 
     /**
-     * Проверяет происходит ли сейчас формирование статичного вида для шаблона
+     * Проверяет происходит ли сейчас формирование статичного вида для шаблона, событие внутри движка, который формирует 1 файл вида, общий css и js
      *
      * @return bool
      */
@@ -186,11 +184,12 @@ class routes extends \Module
             return p404::error404();
         }
 
-        $vadr = self::remove_admin_adr($adr);
+        $vadr             = self::remove_admin_adr($adr);
         self::$currentAdr = $vadr;
-        $module = self::get_module($vadr);
-        $adm = new CMS;
+        $module           = self::get_module($vadr);
+        $adm              = new CMS;
         $adm->innerModule = $module;
+
         return $adm;
     }
 
@@ -200,18 +199,18 @@ class routes extends \Module
 
         $adr = empty($adr) ? '/' : $adr;
         $adr = preg_replace('~/$~', '', $adr);
+
         return $adr;
     }
 
     private static function get_module($adr)
     {
-        $adr = preg_replace('~/$~', '', $adr);
+        $adr        = preg_replace('~/$~', '', $adr);
         $idTemplate = self::get_template_id($adr);
-
 
         if ($idTemplate == null)
         {
-            return p404::error404();
+            return new p404();
         }
         else
         {
@@ -221,7 +220,7 @@ class routes extends \Module
             }
             else
             {
-                return p404::error404();
+                return new p404();
             }
         }
     }
@@ -243,6 +242,7 @@ class routes extends \Module
     {
         $adr = preg_replace("/\?.{0,}/", '', $adr);
         $adr = preg_replace("/\#.{0,}/", '', $adr);
+
         return $adr;
     }
 
@@ -261,6 +261,7 @@ class routes extends \Module
             {
                 self::$__current_route_name = $route_name;
                 array_shift(self::$__url_params);
+
                 return $page->idTemplate;
             }
         }
@@ -304,6 +305,7 @@ class routes extends \Module
         $adr = str_replace($_SERVER['HTTP_HOST'], '', $adr);
         $adr = str_replace('http://', '', $adr);
         $adr = str_replace('https://', '', $adr);
+
         return $adr;
     }
 
@@ -354,14 +356,27 @@ class routes extends \Module
      */
     public static function not_ajax($method)
     {
-        if (self::is_ajax() && preg_replace_callback('~.*::~', function ()
-            {
-                return '';
-            }, $method) == self::$__trg_method
-        )
+        if (self::is_ajax() && self::is_target_method($method))
         {
             die('Нельзя обратиться к данному методу! через ajax');
         }
+    }
+
+    private static function __get_route_method($method)
+    {
+        return preg_replace_callback('~.*::~', function ()
+        {
+            return '';
+        }, $method);
+    }
+
+    /**
+     * @param $method __METHOD__
+     * @return mixed
+     */
+    public static function is_target_method($method)
+    {
+        return self::__get_route_method($method) == self::$__trg_method;
     }
 
     /**
@@ -377,23 +392,25 @@ class routes extends \Module
 
         if (count(self::$__all_pages) && isset(self::$__all_pages->$page_name))
         {
-            $route = self::$__all_pages->$page_name;
-            $i = 0;
+            $route  = self::$__all_pages->$page_name;
+            $i      = 0;
             $string = preg_replace_callback("~\(.*\)~Usi", function ($regular_path) use (&$i, $params)
             {
                 $ret = isset($params[$i]) && !self::__is_get($params[$i]) ? $params[$i] : '';
 
                 $regular_path[0] = str_replace(['.'], '', $regular_path[0]);
-                $m = [];
+                $m               = [];
                 preg_match("~$regular_path[0]~", $ret, $m);
                 $i++;
+
                 return isset($m[1]) ? $m[1] : '';
             }, $route->unicalPageName);
 
             $string = trim(urldecode(mb_strtolower($string)));
-            $string = str_replace(['^', '$', '{0,1}', '\\', '\\\\', '|', '*', '.'], '', $string);
+            $string = str_replace(['^', '$', '{0,1}', '\\', '\\\\', '|', '*', '.', '?'], '', $string);
             $string = str_replace(['/////', '////', '///', '//'], '/', $string);
             $string = str_replace(['  ', ' '], [' ', '+'], $string);
+
             return $string . self::__dop_get($params);
         }
 
