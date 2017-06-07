@@ -7,6 +7,8 @@ class DB
 
     const M_USE_VALUE_BY_KEY = 'M_USE_VALUE_BY_KEY';
     protected static $conf;
+    private static $TIMER   = 0;
+    private static $QUERIES = 0;
     protected        $__mysqli      = null;
     protected        $__sql         = '';
     protected        $__last_sql    = '';
@@ -148,6 +150,287 @@ class DB
         $this->__is_array = $value;
 
         return $this;
+    }
+
+    /**
+     * Можно получить после сборки запроса ->get() или ->get_result_sql
+     *
+     * @return array
+     */
+    public function get_params_array()
+    {
+        return $this->__params;
+    }
+
+    public function count()
+    {
+        $count_query = clone $this;
+        $count_query->s(['count(*) as count'])->is_mono()->limit(null)->offset(null)->o('');
+        $qc = $count_query->get();
+
+        return isset($qc->count) ? $qc->count : (is_array($qc) ? count($qc) : 0);
+    }
+
+    /**
+     *
+     * @param $sql NO WORDS ORDER BY
+     * @return \MBCMS\DB
+     */
+    public function o($sql)
+    {
+        $this->__order = $sql;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param int $value ->offset(),->limit()
+     * @return $this
+     */
+    public function offset($value)
+    {
+        $this->__offset = $value;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param int $value ->offset(),->limit()
+     * @return $this
+     */
+    public function limit($value)
+    {
+        $this->__limit = $value;
+
+        return $this;
+    }
+
+    /**
+     * Если результатом запроса является массив с 1 записью, то вернет не массив а только эту запись.
+     * Но даже если указан этот параметр, но массив вернется с несколькими записями, то данное действие будет проигнорировано.
+     * Для верного результата можно использовать в сочетвнии с limit(1)
+     * @param bool $value
+     * @return $this or null
+     */
+    public function is_mono($value = true)
+    {
+        $this->__is_mono = $value;
+
+        return $this;
+    }
+
+    /**
+     *
+     * // Добавить метод, добавляющий в селект group_concat(t_images_tags.value separator ',') as mytags
+     *
+     * @param array $columns индексный массив строк
+     * @param string $table_name
+     * @param bool $is_merge_columns = false
+     * @return \MBCMS\DB
+     */
+    public function s(array $columns, $table_name = null, $is_merge_columns = false)
+    {
+        $this->__select[0] = isset($this->__select[0]) && $this->__select[0] ? $this->__select[0] : $table_name;
+        $this->__select[1] = $is_merge_columns ? array_merge($columns, (isset($this->__select[1]) ? $this->__select[1] : [])) : $columns;
+
+        return $this;
+    }
+
+    /**
+     * @return object|null|array
+     */
+    public function get()
+    {
+
+        $this->__merged();
+        $result = $this->__query();
+        $this->__clear();
+
+        return $result;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function __query()
+    {
+        $ttttttttttt = microtime_float();
+
+
+        $this->__mysqli();
+
+        if ($this->__smtm = $this->__mysqli->prepare($this->__sql))
+        {
+
+            $this->__last_sql = $this->__sql;
+
+            $params = [];
+            $idents = null;
+
+            if ($idents = $this->__get_idents())
+            {
+                $params = [$idents];
+            }
+
+            $params = array_merge($params, $this->__params);
+
+            if ($params && $idents)
+            {
+                $refs = [];
+                foreach ($params as $key => $value)
+                {
+                    if ($value === null || is_array($value) || is_object($value))
+                    {
+                        $params[$key] = '';
+                    }
+
+                    $refs[] = &$params[$key];
+                }
+
+                call_user_func_array([$this->__smtm, 'bind_param'], $refs);
+            }
+
+            $this->__smtm->execute();
+
+            $results = $this->__get_result();
+
+            if (isset($this->__mysqli->insert_id) && $this->__mysqli->insert_id)
+            {
+                $results = $this->__mysqli->insert_id;
+            }
+
+            $this->__smtm->close();
+            $this->__mysqli->close();
+
+            unset($this->__smtm);
+            unset($this->__mysqli);
+
+            self::$TIMER += microtime_float($ttttttttttt, 'time', false);
+            self::$QUERIES .= $this->get_result_sql() . "\n\n\n";
+
+            return $results;
+        }
+        else
+        {
+            $er = $this->__mysqli->error ? $this->__mysqli->error : 'NO CONNECT. See Database config';
+
+            if (configuration::factory()->is_static_templates() !== true)
+            {
+                /* MDS */
+                echo '<pre class="btn-inverse">';
+                echo 'SQL error: ' . $er;
+                echo '<br/>';
+                echo $this->__sql;
+                echo '<br/>';
+                echo '======================================================================== ';
+                echo '</pre>'; /* MDS */
+
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array times and queries
+     */
+    public static function get_info()
+    {
+        return [self::$TIMER, self::$QUERIES];
+    }
+
+    private function __mysqli()
+    {
+        $this->__mysqli = new \mysqli(self::$conf['host'], self::$conf['username'], self::$conf['password'], self::$conf['database']);
+    }
+
+    private function __get_idents()
+    {
+        $idents = '';
+
+        foreach ($this->__params as $param)
+        {
+
+            if (is_string($param))
+            {
+                $idents .= 's';
+            }
+            else if (is_int($param))
+            {
+
+                $idents .= 'i';
+            }
+            else if (is_float($param))
+            {
+
+                $idents .= 'd';
+            }
+            else
+            {
+                $idents .= 's';
+            }
+        }
+
+        return $idents;
+    }
+
+    private function __get_result()
+    {
+        $meta       = $this->__smtm->result_metadata();
+        $results    = [];
+        $parameters = [];
+
+        if (method_exists($meta, 'fetch_field'))
+        {
+            while ($field = $meta->fetch_field())
+            {
+                $parameters[] = &$row[$field->name];
+            }
+        }
+
+        if ($parameters && count($parameters))
+        {
+            call_user_func_array([$this->__smtm, 'bind_result'], $parameters);
+        }
+
+        while ($this->__smtm->fetch())
+        {
+            $x = [];
+
+            foreach ($row as $key => $val)
+            {
+                $x[$key] = $val;
+            }
+
+            if (!$this->__is_array)
+            {
+                $x = (object)$x;
+            }
+
+            $results[] = $x;
+        }
+
+        return $this->__mono($results);
+    }
+
+    private function __mono($results)
+    {
+        if ($this->__is_mono && count($results) == 1)
+        {
+            return array_shift($results);
+        }
+        else if (count($results) > 1 && $this->__is_mono)
+        {
+            return $results;
+        }
+        else if ($this->__is_mono && !count($results))
+        {
+            return null;
+        }
+
+        return $results;
     }
 
     /**
@@ -426,272 +709,6 @@ class DB
         {
             $this->r("LIMIT ?", [(int)$this->__limit]);
         }
-    }
-
-    /**
-     * Можно получить после сборки запроса ->get() или ->get_result_sql
-     *
-     * @return array
-     */
-    public function get_params_array()
-    {
-        return $this->__params;
-    }
-
-    public function count()
-    {
-        $count_query = clone $this;
-        $count_query->s(['count(*) as count'])->is_mono()->limit(null)->offset(null)->o('');
-        $qc = $count_query->get();
-
-        return isset($qc->count) ? $qc->count : (is_array($qc) ? count($qc) : 0);
-    }
-
-    /**
-     *
-     * @param $sql NO WORDS ORDER BY
-     * @return \MBCMS\DB
-     */
-    public function o($sql)
-    {
-        $this->__order = $sql;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @param int $value ->offset(),->limit()
-     * @return $this
-     */
-    public function offset($value)
-    {
-        $this->__offset = $value;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @param int $value ->offset(),->limit()
-     * @return $this
-     */
-    public function limit($value)
-    {
-        $this->__limit = $value;
-
-        return $this;
-    }
-
-    /**
-     * Если результатом запроса является массив с 1 записью, то вернет не массив а только эту запись.
-     * Но даже если указан этот параметр, но массив вернется с несколькими записями, то данное действие будет проигнорировано.
-     * Для верного результата можно использовать в сочетвнии с limit(1)
-     * @param bool $value
-     * @return $this or null
-     */
-    public function is_mono($value = true)
-    {
-        $this->__is_mono = $value;
-
-        return $this;
-    }
-
-    /**
-     *
-     * // Добавить метод, добавляющий в селект group_concat(t_images_tags.value separator ',') as mytags
-     *
-     * @param array $columns индексный массив строк
-     * @param string $table_name
-     * @param bool $is_merge_columns = false
-     * @return \MBCMS\DB
-     */
-    public function s(array $columns, $table_name = null, $is_merge_columns = false)
-    {
-        $this->__select[0] = isset($this->__select[0]) && $this->__select[0] ? $this->__select[0] : $table_name;
-        $this->__select[1] = $is_merge_columns ? array_merge($columns, (isset($this->__select[1]) ? $this->__select[1] : [])) : $columns;
-
-        return $this;
-    }
-
-    /**
-     * @return object|null|array
-     */
-    public function get()
-    {
-        $this->__merged();
-        $result = $this->__query();
-        $this->__clear();
-
-        return $result;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function __query()
-    {
-        $this->__mysqli();
-
-        if ($this->__smtm = $this->__mysqli->prepare($this->__sql))
-        {
-
-            $this->__last_sql = $this->__sql;
-
-            $params = [];
-            $idents = null;
-
-            if ($idents = $this->__get_idents())
-            {
-                $params = [$idents];
-            }
-
-            $params = array_merge($params, $this->__params);
-
-            if ($params && $idents)
-            {
-                $refs = [];
-                foreach ($params as $key => $value)
-                {
-                    if ($value === null || is_array($value) || is_object($value))
-                    {
-                        $params[$key] = '';
-                    }
-
-                    $refs[] = &$params[$key];
-                }
-
-                call_user_func_array([$this->__smtm, 'bind_param'], $refs);
-            }
-
-            $this->__smtm->execute();
-
-            $results = $this->__get_result();
-
-            if (isset($this->__mysqli->insert_id) && $this->__mysqli->insert_id)
-            {
-                $results = $this->__mysqli->insert_id;
-            }
-
-            $this->__smtm->close();
-            $this->__mysqli->close();
-
-            unset($this->__smtm);
-            unset($this->__mysqli);
-
-            return $results;
-        }
-        else
-        {
-            $er = $this->__mysqli->error ? $this->__mysqli->error : 'NO CONNECT. See Database config';
-
-            if (configuration::factory()->is_static_templates() !== true)
-            {
-                /* MDS */
-                echo '<pre class="btn-inverse">';
-                echo 'SQL error: ' . $er;
-                echo '<br/>';
-                echo $this->__sql;
-                echo '<br/>';
-                echo '======================================================================== ';
-                echo '</pre>'; /* MDS */
-
-            }
-        }
-
-        return null;
-    }
-
-    private function __mysqli()
-    {
-        $this->__mysqli = new \mysqli(self::$conf['host'], self::$conf['username'], self::$conf['password'], self::$conf['database']);
-    }
-
-    private function __get_idents()
-    {
-        $idents = '';
-
-        foreach ($this->__params as $param)
-        {
-
-            if (is_string($param))
-            {
-                $idents .= 's';
-            }
-            else if (is_int($param))
-            {
-
-                $idents .= 'i';
-            }
-            else if (is_float($param))
-            {
-
-                $idents .= 'd';
-            }
-            else
-            {
-                $idents .= 's';
-            }
-        }
-
-        return $idents;
-    }
-
-    private function __get_result()
-    {
-        $meta       = $this->__smtm->result_metadata();
-        $results    = [];
-        $parameters = [];
-
-        if (method_exists($meta, 'fetch_field'))
-        {
-            while ($field = $meta->fetch_field())
-            {
-                $parameters[] = &$row[$field->name];
-            }
-        }
-
-        if ($parameters && count($parameters))
-        {
-            call_user_func_array([$this->__smtm, 'bind_result'], $parameters);
-        }
-
-        while ($this->__smtm->fetch())
-        {
-            $x = [];
-
-            foreach ($row as $key => $val)
-            {
-                $x[$key] = $val;
-            }
-
-            if (!$this->__is_array)
-            {
-                $x = (object)$x;
-            }
-
-            $results[] = $x;
-        }
-
-        return $this->__mono($results);
-    }
-
-    private function __mono($results)
-    {
-        if ($this->__is_mono && count($results) == 1)
-        {
-            return array_shift($results);
-        }
-        else if (count($results) > 1 && $this->__is_mono)
-        {
-            return $results;
-        }
-        else if ($this->__is_mono && !count($results))
-        {
-            return null;
-        }
-
-        return $results;
     }
 
     /**
