@@ -4,7 +4,7 @@ namespace MBCMS;
 
 use trud\classes\auth;
 
-class configuration implements \adminAjax
+class configuration extends \Autoload implements \adminAjax
 {
 
     const TEMPORAL_FOLDER = 'tmp';
@@ -44,6 +44,11 @@ class configuration implements \adminAjax
         return $this->__static_templates;
     }
 
+    public function is_dev_mod()
+    {
+        return $this->is_static_templates() === 'live' || $this->is_static_templates() === false;
+    }
+
     public function get_db_config()
     {
         routes::not_ajax(__METHOD__);
@@ -57,7 +62,7 @@ class configuration implements \adminAjax
 
     public function is_superadmin()
     {
-        return true;
+        return auth::factory()->admin();
     }
 
     public function is_superadmin_access_die()
@@ -75,4 +80,3 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', (int) !(new configuration())->is_static_templates() || (new configuration())->is_static_templates() === 'live');
 ini_set('display_startup_errors', 1);
 ini_set('opcache.enable_cli', 1);
-
