@@ -8,9 +8,6 @@ define('MPATH', preg_replace('~\\\\$~', DIRECTORY_SEPARATOR, HOME_PATH) . 'modul
 
 include_once MPATH . 'Core/CMS/files/files.php';
 
-const ADMIN = 'status_admin_panel',
-AJAX = 'mbcms_status_ajax';
-
 function echo_attrs($__cms_attrs, $group = 'main')
 {
     $group = !$group ? 'main' : $group;
@@ -66,8 +63,8 @@ function echo_attrs($__cms_attrs, $group = 'main')
 function __many($result, $merge_keys, $key = 'id', $distinct = true, $is_object = true)
 {
 
-    $return = new \stdClass();
-    $__merged_values = [];
+    $return            = new \stdClass();
+    $__merged_values   = [];
     $__distinct_values = [];
 
 
@@ -178,6 +175,7 @@ function date_range($d1, $d2, $key)
     $d1 = $d1 === null ? date('Y-m-d', time()) : $d1;
     $d1 = new \DateTime($d1);
     $d2 = new \DateTime($d2);
+
     return $d1->diff($d2)->{$key};
 }
 
@@ -228,7 +226,7 @@ function isset_echo(&$var, $default = '')
 
 /**
  * @param $variale - значение или возможный массив значений
- * @param $search_value - значение которое необходимо найти
+ * @param $search_value - значение которое необходимо найти, "эталонное значение" которое будет удовлетворять условию, 1 для checkbox например
  * @param $message
  * @param $key если использование $data->key приводит к ошибке @no result@ или как то так, то ключ вписывать сюда
  * @return boolean
@@ -271,6 +269,7 @@ function selected(&$variale, $search_value, $message = null, $key = null)
             {
                 echo $message;
             }
+
             return true;
         }
 
@@ -323,11 +322,11 @@ class GClass
      *
      * @var array массив с информацией по последнему подключеному классу. namespace + className + folderPath
      */
-    public static $classInfo;
-    private static $allClasses = [];
-    private static $__files_classes = [];
+    public static  $classInfo;
+    private static $allClasses             = [];
+    private static $__files_classes        = [];
     private static $__files_classes_update = false;
-    private static $exc = [];
+    private static $exc                    = [];
 
     public static function getExc()
     {
@@ -341,43 +340,49 @@ class GClass
         if (isset(self::$allClasses[$className]))
         {
             self::$classInfo = self::$allClasses[$className]['classinfo'];
+
             return true;
         }
 
         self::$classInfo = null;
+
         return false;
     }
 
     static function autoLoad($className)
     {
+
+
         if (count(self::$__files_classes) == 0)
         {
             self::$__files_classes = \MBCMS\files::get_json(\MBCMS\files::PATH_CLASSES);
 
             foreach (self::$__files_classes as $__class)
             {
-                self::$allClasses[$__class->class]['classinfo'] = self::nameNamespace($__class->class, $__class->script);
+                self::$allClasses[$__class->class]['classinfo']             = self::nameNamespace($__class->class, $__class->script);
                 self::$allClasses[$__class->class]['classinfo']['filename'] = $__class->script;
-                self::$allClasses[$__class->class]['classinfo']['view'] = $__class->view;
+                self::$allClasses[$__class->class]['classinfo']['view']     = $__class->view;
             }
         }
 
         if (isset(self::$allClasses[$className]) && class_exists($className))
         {
             self::$classInfo = self::$allClasses[$className]['classinfo'];
+
             return true;
         }
 
         if ($className === '' || $className === null)
         {
             self::$classInfo = null;
+
             return false;
         }
 
-        $filename = isset(self::$allClasses[$className]['classinfo']['filename']) ? self::$allClasses[$className]['classinfo']['filename'] : '';
-        $sql = new stdClass();
+        $filename    = isset(self::$allClasses[$className]['classinfo']['filename']) ? self::$allClasses[$className]['classinfo']['filename'] : '';
+        $sql         = new stdClass();
         $sql->script = $filename;
-        $sql->class = $className;
+        $sql->class  = $className;
 
         if (isset($sql->script))
         {
@@ -394,6 +399,7 @@ class GClass
         {
             $filename = self::recursiveFinder($className);
         }
+
 
         $connect = self::connect($filename, $className);
         self::updateDB($connect, $sql, $filename, $className, $sql->script);
@@ -414,23 +420,24 @@ class GClass
     {
         $path = self::get_normal_path($path);
 
-        $exp = explode('\\', $className);
+        $exp          = explode('\\', $className);
         $classNamePop = array_pop($exp);
-        $namespace = trim(implode('\\', $exp));
+        $namespace    = trim(implode('\\', $exp));
 
         $parray = explode(DIRECTORY_SEPARATOR, $path);
         array_pop($parray);
         $folderPath = implode(DIRECTORY_SEPARATOR, $parray);
 
-        return array('namespace' => $namespace, 'name' => $classNamePop, 'folder' => $folderPath);
+        return ['namespace' => $namespace, 'name' => $classNamePop, 'folder' => $folderPath];
     }
 
     public static function get_normal_path($path)
     {
-        $path = str_replace([DIRECTORY_SEPARATOR, '\\'], DIRECTORY_SEPARATOR, $path);
+        $path         = str_replace([DIRECTORY_SEPARATOR, '\\'], DIRECTORY_SEPARATOR, $path);
         $current_path = str_replace(HOME_PATH, '', $path);
         $current_path = str_replace('\\', DIRECTORY_SEPARATOR, $current_path);
-        $left_path = preg_replace('~\\\$|/$~', '', HOME_PATH);
+        $left_path    = preg_replace('~\\\$|/$~', '', HOME_PATH);
+
         return str_replace('//', DIRECTORY_SEPARATOR, $left_path . DIRECTORY_SEPARATOR . $current_path);
     }
 
@@ -438,11 +445,12 @@ class GClass
     {
         unset(self::$__files_classes->$className);
 
-        $class = self::nameNamespace($className);
+        $class        = self::nameNamespace($className);
         $classNamePop = $class['name'];
-        $namespace = $class['namespace'];
+        $namespace    = $class['namespace'];
 
         $result = self::recFind(MPATH, $classNamePop, $namespace);
+
         return realpath($result);
     }
 
@@ -504,8 +512,8 @@ class GClass
         $retResult = [];
         if (file_exists($patch) && is_file($patch))
         {
-            $file = fopen($patch, 'r');
-            $text = fread($file, filesize($patch));
+            $file   = fopen($patch, 'r');
+            $text   = fread($file, filesize($patch));
             $result = [];
             preg_match_all('~\Wnamespace\s+(.*);~', $text, $result);
             fclose($file);
@@ -539,7 +547,7 @@ class GClass
 
     private static function findNextFolder($patch, $className, $namespace) // return filename or false
     {
-        $files = scandir($patch);
+        $files    = scandir($patch);
         $filename = false;
         foreach ($files as $file)
         {
@@ -572,19 +580,21 @@ class GClass
     {
         $filename = realpath($filename);
 
+
         if (file_exists($filename) && !is_dir($filename))
         {
             include_once($filename);
 
             if (class_exists($className))
             {
-                self::$classInfo = self::nameNamespace($className, $filename);
+                self::$classInfo             = self::nameNamespace($className, $filename);
                 self::$classInfo['filename'] = $filename;
                 self::$classInfo['view'] = self::getModuleView(self::$classInfo);
 
                 return true;
             }
         }
+
         return false;
     }
 
@@ -592,6 +602,7 @@ class GClass
     {
 
         $folder = $data['folder'];
+
 
         if (file_exists($folder . DIRECTORY_SEPARATOR . '~' . $data['name'] . '~.php'))
         {
@@ -603,14 +614,14 @@ class GClass
             return false;
         }
 
-        $files = scandir($folder);
+        $files     = scandir($folder);
         $view_name = null;
 
         foreach ($files as $file)
         {
             $filename = $folder . DIRECTORY_SEPARATOR . $file;
             $pregtrue = preg_match('~\.php~i', $filename);
-            if ($file !== '.' && $file != '..' && $file != \MBCMS\template::__STATIC_VIEW . '.php' && $file !== $data['name'] . '.php' && is_file($filename) && $pregtrue === 1)
+            if ($file !== '.' && $file != '..'  && $file !=  '__static_view.php' && $file !== $data['name'] . '.php' && is_file($filename) && $pregtrue === 1)
             {
                 $view_name = $folder . DIRECTORY_SEPARATOR . str_replace('.php', '', $file);
                 break;
@@ -649,11 +660,11 @@ class GClass
             array_pop($ar);
 
             $data_array = [
-                'name' => @array_pop(@explode('\\', $className)),
+                'name'   => @array_pop(@explode('\\', $className)),
                 'folder' => implode(DIRECTORY_SEPARATOR, $ar),
             ];
 
-            self::$__files_classes_update = true;
+            self::$__files_classes_update      = true;
             self::$__files_classes->$className = ['class' => $className, 'script' => $scriptPath, 'view' => self::getModuleView($data_array)];
             self::update_file();
         }
@@ -682,23 +693,6 @@ class Autoload
             \GClass::autoLoad($class);
         }
     }
-
-    /**
-     * @return array
-     */
-    static function getClassInfo()
-    {
-        defined('HOME_PATH') or die('No direct script access.');
-
-        $className = get_class(self::class);
-        $info = [];
-
-        GClass::getClassInfo($className);
-        $info['classinfo'] = self::$classInfo;
-
-        return $info;
-    }
-
 }
 
 function gGetNameSpace($path, $string = false)
@@ -706,8 +700,8 @@ function gGetNameSpace($path, $string = false)
     $retResult = [];
     if (file_exists($path) && is_file($path))
     {
-        $file = fopen($path, 'r');
-        $text = fread($file, filesize($path));
+        $file   = fopen($path, 'r');
+        $text   = fread($file, filesize($path));
         $result = [];
         preg_match_all('~\Wnamespace\W(.*);~', $text, $result);
         fclose($file);
@@ -722,7 +716,7 @@ function gGetNameSpace($path, $string = false)
     return $retResult;
 }
 
-spl_autoload_register(array('Autoload', 'myAutoloader'));
+spl_autoload_register(['Autoload', 'myAutoloader']);
 
 class Modules extends \Autoload
 {
@@ -731,14 +725,14 @@ class Modules extends \Autoload
     /**
      * @var array
      */
-    protected static $OBJECTS = [];
-    protected static $FILES = array('css' => [], 'top_js' => [], 'bottom_js' => []);
-    protected static $MAIN_VIEWS = [];
-    protected static $STRUCTURE_MAP = [];
-    protected static $first = true;
-    private static $ALL_THIS_CONNECTION_GET_NUMB = 0;
-    private static $listner_functions = [];
-    private static $lastStructure = [];
+    protected static $OBJECTS                      = [];
+    protected static $FILES                        = ['css' => [], 'top_js' => [], 'bottom_js' => []];
+    protected static $MAIN_VIEWS                   = [];
+    protected static $STRUCTURE_MAP                = [];
+    protected static $first                        = true;
+    private static   $ALL_THIS_CONNECTION_GET_NUMB = 0;
+    private static   $listner_functions            = [];
+    private static   $lastStructure                = [];
 
     /**
      * Формирует запрос на получение вида модуля, без сбора файлов, для вторичных запросов на виды
@@ -758,7 +752,7 @@ class Modules extends \Autoload
         $module->view_prioritet_index(1, 1);
         $module->THIS_CONNECTION_PARENT_ID = null;
         $module->THIS_CONNECTION_MODULE_ID = null;
-        $module->__cms_module_position = null;
+        $module->__cms_module_position     = null;
 
         foreach ($connect_modules as $m)
         {
@@ -775,11 +769,11 @@ class Modules extends \Autoload
 
     private static function __clear_struct()
     {
-        self::$OBJECTS = [];
-        self::$FILES = [];
-        self::$MAIN_VIEWS = [];
-        self::$STRUCTURE_MAP = [];
-        self::$ALL_THIS_CONNECTION_GET_NUMB = 0;
+        self::$OBJECTS                          = [];
+        self::$FILES                            = [];
+        self::$MAIN_VIEWS                       = [];
+        self::$STRUCTURE_MAP                    = [];
+        self::$ALL_THIS_CONNECTION_GET_NUMB     = 0;
         self::$GLOBAL_THIS_CONNECTION_MODULE_ID = 0;
     }
 
@@ -845,7 +839,7 @@ class Modules extends \Autoload
         foreach (self::$OBJECTS as $id => $module)
         {
 
-            $parentId = $module->get_my_parent_id();
+            $parentId  = $module->get_my_parent_id();
             $parentIdv = $parentId !== null ? $parentId : -1;
 
             self::$STRUCTURE_MAP[$parentIdv][$id] = [];
@@ -1002,7 +996,7 @@ class Modules extends \Autoload
                 {
                     $__in_childs = self::find_object_childrens($module->get_my_id(), $property_filter, $recursive);
                     $__in_childs = is_array($__in_childs) ? $__in_childs : [];
-                    $ret = array_merge($ret, $__in_childs);
+                    $ret         = array_merge($ret, $__in_childs);
                 }
 
                 $add_in_result = true;
@@ -1040,8 +1034,8 @@ class Modules extends \Autoload
     {
 
         $childrens = self::find_object_childrens($module->get_my_id());
-        $parent = \Modules::find_object_parent($module);
-        $pos = $module->__cms_module_position;
+        $parent    = \Modules::find_object_parent($module);
+        $pos       = $module->__cms_module_position;
         foreach ($childrens as $children)
         {
             if ($parent !== null)
@@ -1131,12 +1125,13 @@ function microtime_float($time_start = null, $request = '', $dump = true, $filte
     if ($time_start === null)
     {
         list($usec, $sec) = explode(" ", microtime());
+
         return ((float)$usec + (float)$sec);
     }
     else
     {
         $time_end = microtime_float();
-        $time = $time_end - $time_start;
+        $time     = $time_end - $time_start;
         if ($dump && $time > $filter_value)
         {
             if ($vardump_value)
@@ -1161,6 +1156,7 @@ function microtime_float($time_start = null, $request = '', $dump = true, $filte
                 echo '<br/>';
             }
         }
+
         return $time;
     }
 }
