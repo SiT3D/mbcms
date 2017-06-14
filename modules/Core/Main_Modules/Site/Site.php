@@ -26,10 +26,7 @@ class Site extends \Module
 
         $resultModule = routes::start();
 
-        if ($resultModule)
-        {
-            $this->ADDM($resultModule, 'modules');
-        }
+
 
         $wp = new wrapper();
         $wp::setPageTitle(isset($resultModule->CMSData['settingsData']['metatitle']) && $resultModule->CMSData['settingsData']['metatitle']
@@ -38,6 +35,14 @@ class Site extends \Module
             ? $resultModule->CMSData['settingsData']['metadescription'] : '');
         $wp::setPageMetawords(isset($resultModule->CMSData['settingsData']['metakeywords']) && $resultModule->CMSData['settingsData']['metakeywords']
             ? $resultModule->CMSData['settingsData']['metakeywords'] : '');
+
+
+        if ($resultModule)
+        {
+            $this->ADDM($resultModule, 'modules');
+        }
+
+
         $wp->wrap_around_target($this, 'modules');
         $wp->view_prioritet_index(-10);
 
