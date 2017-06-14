@@ -30,7 +30,7 @@ class cache
     {
         $this->__key       = $key;
         $this->__life_time = $life_time;
-        $this->__force     = \GetPost::uget('fc') ? true : $force;
+        $this->__force     = $force;
     }
 
     public static function get_files_dir()
@@ -51,14 +51,14 @@ class cache
     }
 
     /**
-     * Удаляет раз в 10 дней по умолчанию
+     * Удаляет раз в 5 дней по умолчанию
      * Удаляет весь кеш!! Тоесть все пользователи будут разлогинены.
      */
     public static function delete()
     {
-        if (self::timer('remove_all_caches_files', 10, self::DAYS))
+        if (self::timer('remove_all_caches_files', 5, self::DAYS))
         {
-            files::remove_dir(self::__dir(), 3600 * 24 * 12); // удалить кеш старше 12 дней
+            files::remove_dir(self::__dir(), 3600 * 24 * 10); // удалить кеш старше 12 дней
         }
     }
 
@@ -193,7 +193,14 @@ class cache
     private static function __write($filename, $data)
     {
         $data = serialize($data);
-        file_put_contents($filename, $data);
+        if (!file_exists($filename))
+        {
+            file_put_contents($filename, $data, FILE_APPEND);
+        }
+        else
+        {
+            file_put_contents($filename, $data);
+        }
     }
 
     /**
