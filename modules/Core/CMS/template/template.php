@@ -9,11 +9,11 @@ use Modules;
 class template extends \Module implements \adminAjax
 {
 
-    const __STATIC__ = 'public';
-    const __STATIC_VIEW = '__static_view';
+    const __STATIC__             = 'public';
+    const __STATIC_VIEW          = '__static_view';
     const __STATIC_RESOURCE_NAME = 'min_';
     private static $__current_folders = [];
-    private $__php_class;
+    private        $__php_class;
 
     public static function get_all_templates()
     {
@@ -70,7 +70,7 @@ class template extends \Module implements \adminAjax
             return;
         }
 
-        $childrens =  $new_template->find_my_childrens([], true);
+        $childrens = $new_template->find_my_childrens([], true);
         foreach ($childrens as $__ch_key => $child)
         {
             if (!isset($child->CMSData))
@@ -92,7 +92,7 @@ class template extends \Module implements \adminAjax
         $files = $files ? $files : [];
         wrapper::set_prioritets($files);
 
-        $d = self::get_module_cms_data_by_id($idTemplate);
+        $d         = self::get_module_cms_data_by_id($idTemplate);
         $className = $d['name'];
         GClass::getClassInfo($className);
         $path = GClass::$classInfo['folder'] . DIRECTORY_SEPARATOR . self::__STATIC_VIEW . '.php';
@@ -112,8 +112,8 @@ class template extends \Module implements \adminAjax
             }
 
 
-            $ext = str_replace(['top_', 'bottom_'], '', $type);
-            $current_file_path = $dir . DIRECTORY_SEPARATOR . self::__STATIC_RESOURCE_NAME . $idTemplate .  '.' . $ext;
+            $ext               = str_replace(['top_', 'bottom_'], '', $type);
+            $current_file_path = $dir . DIRECTORY_SEPARATOR . self::__STATIC_RESOURCE_NAME . $idTemplate . '.' . $ext;
             file_put_contents($current_file_path, '');
 
             foreach ($tfiles as $file)
@@ -124,7 +124,7 @@ class template extends \Module implements \adminAjax
 
                 if (file_exists($current_file))
                 {
-                    file_put_contents($current_file_path, self::__compress(file_get_contents($current_file)) , FILE_APPEND);
+                    file_put_contents($current_file_path, self::__compress(file_get_contents($current_file)), FILE_APPEND);
                 }
             }
         }
@@ -133,97 +133,16 @@ class template extends \Module implements \adminAjax
         file_put_contents($path, $view);
     }
 
-    private static function __compress($code)
-    {
-
-        $code = preg_replace_callback('~/\*.*?\*/~s', function()
-        {
-            return '';
-        }, $code);
-
-        $code = preg_replace_callback('~\n\s*//.*\n~Us', function()
-        {
-            return "\n";
-        }, $code);
-
-        $code = preg_replace_callback('~\n\s*//.*\n~Us', function()
-        {
-            return "\n";
-        }, $code);
-
-        $code = preg_replace_callback('~\n\s*//.*\n~Us', function()
-        {
-            return "\n";
-        }, $code);
-
-        $code = preg_replace_callback('~\n\n~Us', function()
-        {
-            return ' ';
-        }, $code);
-
-        $code = preg_replace_callback('~\n\n~Us', function()
-        {
-            return ' ';
-        }, $code);
-
-        $code = preg_replace_callback('~\n\n~Us', function()
-        {
-            return ' ';
-        }, $code);
-
-        $code = preg_replace_callback('~\n\n~Us', function()
-        {
-            return ' ';
-        }, $code);
-
-        $code = preg_replace_callback('~\{\n~Us', function()
-        {
-            return '{ ';
-        }, $code);
-
-        $code = preg_replace_callback('~\n\{~Us', function()
-        {
-            return ' {';
-        }, $code);
-
-        $code = preg_replace_callback('~\t~s', function()
-        {
-            return ' ';
-        }, $code);
-
-        $code = preg_replace_callback('~,\n~s', function()
-        {
-            return ',';
-        }, $code);
-
-        $code = preg_replace_callback('~;\n~s', function()
-        {
-            return ';';
-        }, $code);
-
-        $code = preg_replace_callback('~\}\n~s', function()
-        {
-            return '}';
-        }, $code);
-
-
-        $code = str_replace('  ', ' ', $code);
-        $code = str_replace('  ', ' ', $code);
-        $code = str_replace('  ', ' ', $code);
-
-        return $code;
-    }
-
     public static function destroy_static_view($idTemplate = null)
     {
 
         $idTemplate = $idTemplate ? $idTemplate : \GetPost::get('idTemplate');
 
 
-        $d = self::get_module_cms_data_by_id($idTemplate);
+        $d         = self::get_module_cms_data_by_id($idTemplate);
         $className = $d['name'];
         GClass::getClassInfo($className);
-        $path = GClass::$classInfo['folder'] . DIRECTORY_SEPARATOR . self::__STATIC_VIEW . '.php';
+        $path          = GClass::$classInfo['folder'] . DIRECTORY_SEPARATOR . self::__STATIC_VIEW . '.php';
         $__static_path = GClass::$classInfo['folder'] . DIRECTORY_SEPARATOR . self::__STATIC__;
 
         files::remove_dir($__static_path);
@@ -255,7 +174,7 @@ class template extends \Module implements \adminAjax
                         continue;
                     }
 
-                    $path = $folder . DIRECTORY_SEPARATOR . $file;
+                    $path     = $folder . DIRECTORY_SEPARATOR . $file;
                     $new_file = GClass::$classInfo['folder'] . DIRECTORY_SEPARATOR . self::__STATIC__ . "/$type/" . $file;
                     if (is_dir($path) && !file_exists($new_file))
                     {
@@ -266,6 +185,88 @@ class template extends \Module implements \adminAjax
 
             self::$__current_folders[$folder] = true;
         }
+    }
+
+    private static function __compress($code)
+    {
+
+        $code = preg_replace_callback('~/\*.*?\*/~s', function ()
+        {
+            return '';
+        }, $code);
+
+
+        for ($i = 0; $i < 10; $i++)
+        {
+
+            $code = preg_replace_callback('~\n\s*//.*\{*\n~U', function ($t)
+            {
+                return "\n";
+            }, $code);
+
+            $code = preg_replace_callback('~\n\s*//.*\n~U', function ($t)
+            {
+                return "\n";
+            }, $code);
+        }
+
+
+        $code = preg_replace_callback('~\n\n~Us', function ()
+        {
+            return ' ';
+        }, $code);
+
+        $code = preg_replace_callback('~\n\n~Us', function ()
+        {
+            return ' ';
+        }, $code);
+
+        $code = preg_replace_callback('~\n\n~Us', function ()
+        {
+            return ' ';
+        }, $code);
+
+        $code = preg_replace_callback('~\n\n~Us', function ()
+        {
+            return ' ';
+        }, $code);
+
+        $code = preg_replace_callback('~\{\n~Us', function ()
+        {
+            return '{ ';
+        }, $code);
+
+        $code = preg_replace_callback('~\n\{~Us', function ()
+        {
+            return ' {';
+        }, $code);
+
+        $code = preg_replace_callback('~\t~s', function ()
+        {
+            return ' ';
+        }, $code);
+
+        $code = preg_replace_callback('~,\n~s', function ()
+        {
+            return ',';
+        }, $code);
+
+        $code = preg_replace_callback('~;\n~s', function ()
+        {
+            return ';';
+        }, $code);
+
+        $code = preg_replace_callback('~\}\n~s', function ()
+        {
+            return '}';
+        }, $code);
+
+
+        $code = str_replace('  ', ' ', $code);
+        $code = str_replace('  ', ' ', $code);
+        $code = str_replace('  ', ' ', $code);
+
+        return $code;
     }
 
     /**
@@ -290,15 +291,15 @@ class template extends \Module implements \adminAjax
     private static function __create_new_template($name, $path, $new_idTemplate)
     {
         $settingsData = ['__cms_template_index' => $new_idTemplate, '__user_cms_class' => 'this'];
-        $tData = [
-            'idTemplate' => $new_idTemplate,
-            'childrens' => '[]',
-            'name' => $name,
+        $tData        = [
+            'idTemplate'   => $new_idTemplate,
+            'childrens'    => '[]',
+            'name'         => $name,
             'settingsData' => json_encode($settingsData),
-            'outputs' => '[]',
-            'title' => '',
-            'description' => '',
-            'path' => $path,
+            'outputs'      => '[]',
+            'title'        => '',
+            'description'  => '',
+            'path'         => $path,
         ];
 
         \Module::generate_php_template($new_idTemplate, $tData);
@@ -349,6 +350,7 @@ class template extends \Module implements \adminAjax
         if ($idTemplate)
         {
             $className = 'User\\' . $idTemplate;
+
             return GClass::autoLoad($className);
         }
 
@@ -358,15 +360,15 @@ class template extends \Module implements \adminAjax
     function resort()
     {
         $idTemplate = \GetPost::get('idTemplate');
-        $indexis = \GetPost::get('indexis');
+        $indexis    = \GetPost::get('indexis');
         \Module::resort_templates($idTemplate, $indexis);
     }
 
     function add_new()
     {
-        $idTemplate = \GetPost::get('idTemplate');
+        $idTemplate         = \GetPost::get('idTemplate');
         $new_idTemplate_chd = \GetPost::get('new_idTemplate');
-        $new_idTemplate = \Module::add_new_template($idTemplate, 't' . $new_idTemplate_chd);
+        $new_idTemplate     = \Module::add_new_template($idTemplate, 't' . $new_idTemplate_chd);
 
         self::add_response('idTemplate', $new_idTemplate);
         self::response();
@@ -374,16 +376,16 @@ class template extends \Module implements \adminAjax
 
     function add()
     {
-        $idTemplate = \GetPost::get('idTemplate');
+        $idTemplate          = \GetPost::get('idTemplate');
         $children_idTemplate = \GetPost::get('children_idTemplate');
         \Module::add_template($idTemplate, $children_idTemplate);
     }
 
     function tclone()
     {
-        $idTemplate = \GetPost::get('parent_idTemplate');
+        $idTemplate          = \GetPost::get('parent_idTemplate');
         $children_idTemplate = \GetPost::get('children_idTemplate');
-        $count = \GetPost::get('count');
+        $count               = \GetPost::get('count');
 
         if ($idTemplate)
         {
@@ -396,7 +398,7 @@ class template extends \Module implements \adminAjax
     function remove()
     {
         $parentidtemplate = \GetPost::get('parentidtemplate');
-        $idTemplate = \GetPost::get('idTemplate');
+        $idTemplate       = \GetPost::get('idTemplate');
         \Module::remove_template($parentidtemplate, $idTemplate);
 
         self::add_response('id', $parentidtemplate);
@@ -416,7 +418,7 @@ class template extends \Module implements \adminAjax
     public function save_meta()
     {
         $idTemplate = \GetPost::get('idTemplate');
-        $info = \GetPost::get('info');
+        $info       = \GetPost::get('info');
 
         $d = self::get_module_cms_data_by_id($idTemplate);
         $d = array_merge($d, $info);
@@ -426,7 +428,7 @@ class template extends \Module implements \adminAjax
     public function update_settings()
     {
         $idTemplate = \GetPost::get('idTemplate');
-        $settings = \GetPost::get('settings', []);
+        $settings   = \GetPost::get('settings', []);
 
         self::update_settings_by_id($idTemplate, $settings);
     }
@@ -436,7 +438,7 @@ class template extends \Module implements \adminAjax
         $idTemplate = \GetPost::get('idTemplate');
 
         self::add_response('$idTemplate', $idTemplate);
-        $d = self::get_module_cms_data_by_id($idTemplate);
+        $d         = self::get_module_cms_data_by_id($idTemplate);
         $className = $d['name'];
         self::add_response('name', $d['name']);
 
@@ -444,7 +446,7 @@ class template extends \Module implements \adminAjax
         {
             self::add_response('autoload', true);
             $folder = GClass::$classInfo['folder'] . '/css';
-            $files = [];
+            $files  = [];
 
             if (file_exists($folder))
             {
@@ -465,9 +467,9 @@ class template extends \Module implements \adminAjax
 
     public function copy_css_list()
     {
-        $idTemplate = \GetPost::get('idTemplate');
+        $idTemplate       = \GetPost::get('idTemplate');
         $idTemplate_paste = \GetPost::get('idTemplate_paste');
-        $list = \GetPost::get('list');
+        $list             = \GetPost::get('list');
 
         get_all_templates::copy_css_files($idTemplate, $idTemplate_paste, $list);
     }
@@ -475,7 +477,7 @@ class template extends \Module implements \adminAjax
     public function delete_css_list()
     {
         $idTemplate = \GetPost::get('idTemplate');
-        $list = \GetPost::get('list');
+        $list       = \GetPost::get('list');
 
         get_all_templates::delete_css_files($idTemplate, $list);
     }
@@ -483,7 +485,7 @@ class template extends \Module implements \adminAjax
     public function clone_css_list()
     {
         $idTemplate = \GetPost::get('idTemplate');
-        $list = \GetPost::get('list');
+        $list       = \GetPost::get('list');
 
         get_all_templates::clone_css_files($idTemplate, $list);
     }
@@ -527,7 +529,7 @@ class template extends \Module implements \adminAjax
         $d = self::get_module_cms_data_by_id($idTemplate);
         if (GClass::autoLoad($d['name']))
         {
-            $file = GClass::$classInfo['folder'] . '/css/' . $name . '.css';
+            $file     = GClass::$classInfo['folder'] . '/css/' . $name . '.css';
             $new_file = GClass::$classInfo['folder'] . '/css/' . $new_name . '.css';
             if (file_exists($file))
             {
@@ -541,14 +543,14 @@ class template extends \Module implements \adminAjax
 
     public function transfer()
     {
-        $path = \GetPost::get('path');
+        $path       = \GetPost::get('path');
         $idTemplate = \GetPost::get('id');
 
         if (GetAllTemplates\folder_actions::have_path($path))
         {
             self::add_response('transfer', true);
-            $path = $path == DIRECTORY_SEPARATOR ? '' : $path;
-            $d = self::get_module_cms_data_by_id($idTemplate);
+            $path      = $path == DIRECTORY_SEPARATOR ? '' : $path;
+            $d         = self::get_module_cms_data_by_id($idTemplate);
             $d['path'] = $path;
             self::generate_php_template($idTemplate, $d);
         }
@@ -571,10 +573,10 @@ class template extends \Module implements \adminAjax
     public function update_styles($idTemplate = null, $current_class = null, $parent_class = null, $options_data = [], $media_screen_size = 'standart_screen_size_fulscreen')
     {
         // если приходит значение destroy то не сохранять, а удалять значение!
-        $this->idTemplate = \GetPost::get('idTemplate', $idTemplate);
-        $this->current_class = \GetPost::get('current_class', $current_class);
-        $this->parent_class = \GetPost::get('parent_class', $parent_class);
-        $this->options_data = \GetPost::get('options_data', $options_data);
+        $this->idTemplate        = \GetPost::get('idTemplate', $idTemplate);
+        $this->current_class     = \GetPost::get('current_class', $current_class);
+        $this->parent_class      = \GetPost::get('parent_class', $parent_class);
+        $this->options_data      = \GetPost::get('options_data', $options_data);
         $this->media_screen_size = \GetPost::get('media_screen_size', $media_screen_size);
 
         $styles_data = $this->__load_styles($this->idTemplate, $this->current_class);
@@ -596,7 +598,7 @@ class template extends \Module implements \adminAjax
         }
         else
         {
-            $styles_data[$this->media_screen_size] = [];
+            $styles_data[$this->media_screen_size]            = [];
             $styles_data[$this->media_screen_size]['options'] = $this->options_data;
         }
 
@@ -604,7 +606,7 @@ class template extends \Module implements \adminAjax
         {
             $data = \Module::get_module_cms_data_by_id($this->idTemplate);
 
-            $className = $data['name'];
+            $className         = $data['name'];
             $this->module_name = '.' . str_replace('\\', '__', $className);
             GClass::getClassInfo($className);
             $this->templateFolder = GClass::$classInfo['folder'];
@@ -619,7 +621,7 @@ class template extends \Module implements \adminAjax
      */
     private function __load_styles($idTemplate, $current_class)
     {
-        $data = \Module::get_module_cms_data_by_id($idTemplate);
+        $data      = \Module::get_module_cms_data_by_id($idTemplate);
         $className = $data['name'];
         GClass::getClassInfo($className);
         $this->templateFolder = GClass::$classInfo['folder'];
@@ -628,7 +630,7 @@ class template extends \Module implements \adminAjax
         $current_class = str_replace(' ', '.', trim(str_replace('  ', ' ', $current_class)));
 
         $filepath = $this->templateFolder . '/css/' . $current_class . '.css';
-        $css = '';
+        $css      = '';
 
 
         if (file_exists($filepath))
@@ -646,8 +648,8 @@ class template extends \Module implements \adminAjax
 
     private function __preparse_find_media_screens($css, $current_class)
     {
-        $sizes = [];
-        $result = [];
+        $sizes      = [];
+        $result     = [];
         $screen_css = [];
 
         $current_class = '.' . str_replace(' ', '.', str_replace('  ', ' ', $current_class));
@@ -673,7 +675,7 @@ class template extends \Module implements \adminAjax
 
         preg_match('~\\' . $current_class . '.*\{(.*)\}~Usm', $css, $result);
 
-        $moduleOptions = isset($result[1]) ? $result[1] : '';
+        $moduleOptions     = isset($result[1]) ? $result[1] : '';
         $this->__php_class = trim(str_replace(isset($result[0]) ? $result[0] : '', '', $css));
 
         preg_match_all('~(.*):(.*);~Usm', $moduleOptions, $result);
@@ -684,7 +686,7 @@ class template extends \Module implements \adminAjax
         {
             foreach ($result[1] as $index => $key)
             {
-                $key = str_replace("\n", '', str_replace(' ', '', str_replace('-', '_', $key)));
+                $key                 = str_replace("\n", '', str_replace(' ', '', str_replace('-', '_', $key)));
                 $this->options[$key] = trim($result[2][$index]);
             }
         }
@@ -742,10 +744,10 @@ class template extends \Module implements \adminAjax
     private function __resort_sizes($array)
     {
         $new_sizes = [];
-        $new_keys = [];
-        $min = 1000000;
-        $max = -1000000;
-        $integer = [];
+        $new_keys  = [];
+        $min       = 1000000;
+        $max       = -1000000;
+        $integer   = [];
 
         foreach ($array as $size => $ar)
         {
@@ -783,7 +785,7 @@ class template extends \Module implements \adminAjax
     private function __generate_css_string($css_styles)
     {
         $children_selector = $this->parent_class !== $this->current_class ? '[parentidtemplate="' . $this->idTemplate . '"]' : '';
-        $css = $this->module_name . '.' . self::__standart_reform_css($this->current_class) . $children_selector . "\n{\n";
+        $css               = $this->module_name . '.' . self::__standart_reform_css($this->current_class) . $children_selector . "\n{\n";
 
         foreach ($css_styles as $key => $style)
         {
@@ -827,14 +829,14 @@ class template extends \Module implements \adminAjax
      */
     public function load_styles($return = false)
     {
-        $this->idTemplate = \GetPost::get('idTemplate');
-        $this->current_class = \GetPost::get('current_class');
-        $this->__mini = \GetPost::get('mini', false);
+        $this->idTemplate        = \GetPost::get('idTemplate');
+        $this->current_class     = \GetPost::get('current_class');
+        $this->__mini            = \GetPost::get('mini', false);
         $this->media_screen_size = \GetPost::get('media_screen_size', 'standart_screen_size_fulscreen');
 
         if ($this->idTemplate)
         {
-            $ret = [];
+            $ret    = [];
             $styles = $this->__load_styles($this->idTemplate, $this->current_class);
 
             if ($this->__mini)
