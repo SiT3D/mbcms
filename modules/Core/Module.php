@@ -578,13 +578,16 @@ class Module extends Autoload
         echo json_encode(self::$__response, JSON_UNESCAPED_UNICODE);
         self::$__response = null;
 
-        if ($method && routes::is_target_method($method))
+        if (routes::is_ajax())
         {
-            die();
-        }
-        else if ($method === null)
-        {
-            die();
+            if ($method && routes::is_target_method($method))
+            {
+                die();
+            }
+            else if ($method === null)
+            {
+                die();
+            }
         }
     }
 
