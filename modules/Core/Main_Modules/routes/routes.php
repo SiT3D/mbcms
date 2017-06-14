@@ -126,8 +126,13 @@ class routes extends \Module
      * @param bool $with_die = false если осуществляется редирект на другую страницу (не 404) то нужно обрывать выполнение кода через die()
      * @return bool
      */
-    public static function redirect($uri, $code = '302', $with_die = false)
+    public static function redirect($uri, $code = null, $with_die = false)
     {
+        if ($code === null)
+        {
+            $code = '302';
+        }
+
         if (self::is_static_status() || routes::is_admin())
         {
             return false;
