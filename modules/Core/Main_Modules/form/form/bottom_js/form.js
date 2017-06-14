@@ -25,6 +25,9 @@ event.site.form.success = function ()
      */
     this.__req = null;
 
+    /**
+     *
+     */
     this.print_errors = function ()
     {
         this.get_req();
@@ -139,6 +142,20 @@ event.site.form.before_send = function ()
         return this;
     };
 
+    this.get_data_value = function (key)
+    {
+        for (var i in this.data)
+        {
+            var obj = this.data[i];
+            if (obj.name == key)
+            {
+                return obj.value;
+            }
+        }
+
+        return null;
+    }
+
 };
 event.site.form.before_send.prototype = Object.create(event.prototype);
 
@@ -164,6 +181,7 @@ site.form = function ()
 
         function call(msg)
         {
+
             var evt = new event.site.form.success().call();
             evt.form = form;
             evt.msg = msg;
@@ -172,6 +190,7 @@ site.form = function ()
             evt.action_method = isset(evt.action.split('->'), '1') ? evt.action.split('->')[1] : null;
         }
 
+
         if (form.find('[type=file]').length > 0)
         {
             site.ajaxf(
@@ -179,10 +198,12 @@ site.form = function ()
                     success: function (msg)
                     {
                         call(msg);
+                        site.form.enable_form_button_by_form(form);
                     },
                     error: function (msg)
                     {
                         call(msg);
+                        site.form.enable_form_button_by_form(form);
                     }
                 }, form);
         }
@@ -195,10 +216,12 @@ site.form = function ()
                     success: function (msg)
                     {
                         call(msg);
+                        site.form.enable_form_button_by_form(form);
                     },
                     error: function (msg)
                     {
                         call(msg);
+                        site.form.enable_form_button_by_form(form);
                     }
                 });
         }
@@ -228,7 +251,11 @@ site.form.prototype.init = function (jq_form)
         .find('[type=submit]')
         .click(function ()
         {
-            self.__send($(this));
+            if (!$(this).hasClass('disable'))
+            {
+                site.form.disable_form_button($(this));
+                self.__send($(this));
+            }
             return false;
         })
     ;
@@ -240,6 +267,26 @@ site.form.prototype.init = function (jq_form)
         });
 
     return this;
+};
+
+site.form.disable_form_button = function(jq_submit_btn)
+{
+    jq_submit_btn.addClass('disable');
+};
+
+site.form.enable_form_button = function(jq_submit_btn)
+{
+    setTimeout(function()
+    {
+        jq_submit_btn.removeClass('disable');
+    }, 3000);
+};
+
+site.form.enable_form_button_by_form = function(jq_form)
+{
+    var jqbtn = jq_form.find('[type=submit]');
+
+    this.enable_form_button(jqbtn);
 };
 
 /**
@@ -254,7 +301,12 @@ site.form.factory = function ()
 site.form.init = function (jq_form)
 {
     site.form.factory().init(jq_form);
-    $('[chosen]').chosen({disable_search_threshold: 10});
+    $('[chosen]').chosen({
+        disable_search_threshold: 10,
+        max_selected_options: 3,
+        placeholder_text_multiple: 'Введите слово для поиска',
+        placeholder_text_single: 'Выберите опцию',
+    });
 };
 
 new event.site.load().listen(function ()
