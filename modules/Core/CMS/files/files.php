@@ -5,10 +5,9 @@ namespace MBCMS;
 class files
 {
 
-    const PATH_CLASSES        = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'classes.json';
-    const PATH_PAGES          = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'pages.json';
-    const PATH_STANDART_PAGES = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'standartPages.json';
-    const PATH_FOLDERS        = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'folders.json';
+    const PATH_CLASSES = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'classes.json';
+    const PATH_PAGES   = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'pages.json';
+    const PATH_FOLDERS = __DIR__ . DIRECTORY_SEPARATOR . 'jsons' . DIRECTORY_SEPARATOR . 'folders.json';
 
     public static  $all_files     = [''];
     private static $upload_errors = ['ext' => [], 'size' => []];
@@ -240,10 +239,9 @@ class files
     /**
      *
      * @param string $global_path example: dir/dir2/file.txt - последняя часть всегда является файлом, и не будет учтена для создания папки!
-     * @param string $start_path
+     * @param string $start_path :: HOME_PATH . DIRECTORY_SEPARATOR . self::FOLDER_NAME
      */
-    public
-    static function create_path_dirs($global_path, $start_path = '')
+    public static function create_path_dirs($global_path, $start_path = '')
     {
         $global_path = str_replace(HOME_PATH, '', $global_path);
         $pieces      = explode(DIRECTORY_SEPARATOR, $global_path);
@@ -257,7 +255,7 @@ class files
 
             if (!file_exists($current_path))
             {
-                mkdir($current_path);
+                @mkdir($current_path);
             }
         }
     }
