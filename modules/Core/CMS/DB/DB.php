@@ -162,10 +162,10 @@ class DB
         return $this->__params;
     }
 
-    public function count()
+    public function count($is_mono = true)
     {
         $count_query = clone $this;
-        $count_query->s(['count(*) as count'])->is_mono()->limit(null)->offset(null)->o('');
+        $count_query->s(['count(*) as count'])->is_mono($is_mono)->limit(null)->offset(null)->o('');
         $qc = $count_query->get();
 
         return isset($qc->count) ? $qc->count : (is_array($qc) ? count($qc) : 0);
