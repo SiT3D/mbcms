@@ -71,6 +71,8 @@ class block extends \Module
     {
         parent::init();
 
+        $this->dev_mode = configuration::factory()->is_dev_mod();
+
         if (trim($this->__cms_block_type) == '')
         {
             $this->__cms_block_type = 'div';
@@ -141,6 +143,16 @@ class block extends \Module
     {
         $this->__cms_class      = str_replace($class, '', $this->__cms_class);
         $this->__user_cms_class = str_replace($class, '', $this->__user_cms_class);
+    }
+
+    /**
+     * @param string $_user_cms_class
+     */
+    public function setUserCmsClass($_user_cms_class)
+    {
+        $this->__user_cms_class = $_user_cms_class;
+
+        return $this;
     }
 
 }
