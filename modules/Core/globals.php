@@ -7,6 +7,7 @@ defined('HOME_PATH') or die('No direct script access.');
 define('MPATH', preg_replace('~\\\\$~', DIRECTORY_SEPARATOR, HOME_PATH) . 'modules' . DIRECTORY_SEPARATOR);
 
 include_once MPATH . 'Core/CMS/files/files.php';
+include_once MPATH . 'Core/CMS/logger/logger.php';
 
 function echo_attrs($__cms_attrs, $group = 'main')
 {
@@ -352,6 +353,13 @@ class GClass
     static function autoLoad($className)
     {
 
+        if (isset(self::$allClasses[$className]) && class_exists($className))
+        {
+            self::$classInfo = self::$allClasses[$className]['classinfo'];
+
+            return true;
+        }
+
 
         if (count(self::$__files_classes) == 0)
         {
@@ -365,12 +373,6 @@ class GClass
             }
         }
 
-        if (isset(self::$allClasses[$className]) && class_exists($className))
-        {
-            self::$classInfo = self::$allClasses[$className]['classinfo'];
-
-            return true;
-        }
 
         if ($className === '' || $className === null)
         {
@@ -589,7 +591,7 @@ class GClass
             {
                 self::$classInfo             = self::nameNamespace($className, $filename);
                 self::$classInfo['filename'] = $filename;
-                self::$classInfo['view'] = self::getModuleView(self::$classInfo);
+                self::$classInfo['view']     = self::getModuleView(self::$classInfo);
 
                 return true;
             }
@@ -621,7 +623,7 @@ class GClass
         {
             $filename = $folder . DIRECTORY_SEPARATOR . $file;
             $pregtrue = preg_match('~\.php~i', $filename);
-            if ($file !== '.' && $file != '..'  && $file !=  '__static_view.php' && $file !== $data['name'] . '.php' && is_file($filename) && $pregtrue === 1)
+            if ($file !== '.' && $file != '..' && $file != '__static_view.php' && $file !== $data['name'] . '.php' && is_file($filename) && $pregtrue === 1)
             {
                 $view_name = $folder . DIRECTORY_SEPARATOR . str_replace('.php', '', $file);
                 break;
