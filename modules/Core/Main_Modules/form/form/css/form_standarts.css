@@ -32,6 +32,12 @@ form[order=vertical] label
     height: 0;
 }
 
+.mbcms-form .chosen-container,
+.mbcms-form .cke
+{
+    margin-bottom: 15px;
+}
+
 .mbcms-form .chosen-choices,
 .mbcms-form .chosen-container,
 .mbcms-form input[name]:not([type=submit]),
@@ -44,6 +50,18 @@ form[order=vertical] label
 .mbcms-form [type=submit]
 {
     margin-top: 40px;
+    transition: background-color 1.5s;
+}
+
+.mbcms-form .disable[type=submit]
+{
+    background-color: #fff;
+    pointer-events: none;
+    position: relative;
+    background-image: url('/im/loader.gif');
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    background-position: center;
 }
 
 .mbcms-form button
