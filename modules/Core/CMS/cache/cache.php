@@ -193,9 +193,11 @@ class cache
     private static function __write($filename, $data)
     {
         $data = serialize($data);
+
         if (!file_exists($filename))
         {
-            file_put_contents($filename, $data, FILE_APPEND);
+            files::create_path_dirs($filename, HOME_PATH . self::FOLDER);
+            file_put_contents($filename, $data);
         }
         else
         {
