@@ -16,10 +16,10 @@ site.configuration = undefined;
 site.ajax = function (ajaxOb)
 {
     ajaxOb.url = ajaxOb.url || '/ajax';
-    ajaxOb.method = ajaxOb.method || 'POST';
+    ajaxOb.method = ajaxOb.method ? ajaxOb.method : 'POST';
     ajaxOb.success = ajaxOb.success || function(msg){get_req(msg)};
 
-    $.ajax(ajaxOb);
+    return $.ajax(ajaxOb);
 };
 
 /**
@@ -39,7 +39,7 @@ site.ajaxf = function (ajaxOb, form)
     ajaxOb.data = new FormData(form.get(0));
     ajaxOb.success = ajaxOb.success || function(msg){get_req(msg)};
 
-    $.ajax(ajaxOb);
+    return $.ajax(ajaxOb);
 };
 
 
