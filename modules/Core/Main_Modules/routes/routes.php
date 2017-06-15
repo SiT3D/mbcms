@@ -11,13 +11,14 @@ class routes extends \Module
     private static $currentAdr           = '';
     private static $__set_admin          = null;
     private static $__is_static_status   = false;
-    private static $__all_pages          = [];
+    private static $__all_pages          = null;
     private static $__url_params         = [];
     private static $__trg_method         = '';
     private static $__current_route_name = null;
 
     public static function start()
     {
+
         if (!self::$__all_pages)
         {
             self::$__all_pages = files::get_json(files::PATH_PAGES);
@@ -367,14 +368,6 @@ class routes extends \Module
         }
     }
 
-    private static function __get_route_method($method)
-    {
-        return preg_replace_callback('~.*::~', function ()
-        {
-            return '';
-        }, $method);
-    }
-
     /**
      * @param $method __METHOD__
      * @return mixed
@@ -382,6 +375,14 @@ class routes extends \Module
     public static function is_target_method($method)
     {
         return self::__get_route_method($method) == self::$__trg_method;
+    }
+
+    private static function __get_route_method($method)
+    {
+        return preg_replace_callback('~.*::~', function ()
+        {
+            return '';
+        }, $method);
     }
 
     /**
@@ -394,6 +395,11 @@ class routes extends \Module
     {
         $params = func_get_args();
         array_shift($params);
+
+        if (!self::$__all_pages)
+        {
+            self::$__all_pages = files::get_json(files::PATH_PAGES);
+        }
 
         if (count(self::$__all_pages) && isset(self::$__all_pages->$page_name))
         {
@@ -414,7 +420,7 @@ class routes extends \Module
             $string = trim(urldecode(mb_strtolower($string)));
             $string = str_replace(['^', '$', '{0,1}', '\\', '\\\\', '|', '*', '.', '?'], '', $string);
             $string = str_replace(['/////', '////', '///', '//'], '/', $string);
-            $string = str_replace(['  ', ' '], [' ', '+'], $string);
+            $string = str_replace(['  '], [' '], $string);
 
             return $string . self::__dop_get($params);
         }
