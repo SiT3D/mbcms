@@ -49,7 +49,7 @@ class routes extends \Module
     {
         $adr = self::__get_url_adr();
 
-        return preg_match('~/ajax$|/ajax/?\?|/ajax~', $adr) ? true : false;
+        return preg_match('~/ajax/?($|\?)~', $adr) ? true : false;
     }
 
     private static function ajax_page()
