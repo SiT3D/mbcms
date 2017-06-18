@@ -60,6 +60,7 @@ function echo_attrs($__cms_attrs, $group = 'main')
  * @param $key - ключ по которому идентифицируются записи, по умолчанию id
  * @param bool $distinct (= true) если true то исключать одинаковые значения, если false то нет
  * @param bool $is_object (= true) если true вернет объект, если false то вернет массив объектов
+ * @return array|stdClass
  */
 function __many($result, $merge_keys, $key = 'id', $distinct = true, $is_object = true)
 {
@@ -324,6 +325,7 @@ class GClass
      * @var array массив с информацией по последнему подключеному классу. namespace + className + folderPath
      */
     public static  $classInfo;
+    public static  $TIME                   = 0;
     private static $allClasses             = [];
     private static $__files_classes        = [];
     private static $__files_classes_update = false;
@@ -373,7 +375,6 @@ class GClass
             }
         }
 
-
         if ($className === '' || $className === null)
         {
             self::$classInfo = null;
@@ -402,8 +403,7 @@ class GClass
             $filename = self::recursiveFinder($className);
         }
 
-
-        $connect = self::connect($filename, $className);
+        $connect = self::connect($filename);
         self::updateDB($connect, $sql, $filename, $className, $sql->script);
 
         if (!$connect && !isset(self::$exc[$className]) && trim($className) !== '')
@@ -578,59 +578,16 @@ class GClass
         return false;
     }
 
-    private static function connect($filename, $className)
+    private static function connect($filename)
     {
-        $filename = realpath($filename);
-
-
         if (file_exists($filename) && !is_dir($filename))
         {
             include_once($filename);
 
-            if (class_exists($className))
-            {
-                self::$classInfo             = self::nameNamespace($className, $filename);
-                self::$classInfo['filename'] = $filename;
-                self::$classInfo['view']     = self::getModuleView(self::$classInfo);
-
-                return true;
-            }
+            return true;
         }
 
         return false;
-    }
-
-    private static function getModuleView($data) // todo: искать нужно только для модулей!
-    {
-
-        $folder = $data['folder'];
-
-
-        if (file_exists($folder . DIRECTORY_SEPARATOR . '~' . $data['name'] . '~.php'))
-        {
-            return $folder . DIRECTORY_SEPARATOR . '~' . $data['name'] . '~';
-        }
-
-        if (!file_exists($folder))
-        {
-            return false;
-        }
-
-        $files     = scandir($folder);
-        $view_name = null;
-
-        foreach ($files as $file)
-        {
-            $filename = $folder . DIRECTORY_SEPARATOR . $file;
-            $pregtrue = preg_match('~\.php~i', $filename);
-            if ($file !== '.' && $file != '..' && $file != '__static_view.php' && $file !== $data['name'] . '.php' && is_file($filename) && $pregtrue === 1)
-            {
-                $view_name = $folder . DIRECTORY_SEPARATOR . str_replace('.php', '', $file);
-                break;
-            }
-        }
-
-        return $view_name;
     }
 
     private static function updateDB($find, $sql, $filename, $className, $script)
@@ -670,6 +627,39 @@ class GClass
             self::$__files_classes->$className = ['class' => $className, 'script' => $scriptPath, 'view' => self::getModuleView($data_array)];
             self::update_file();
         }
+    }
+
+    private static function getModuleView($data) // todo: искать нужно только для модулей!
+    {
+
+        $folder = $data['folder'];
+
+
+        if (file_exists($folder . DIRECTORY_SEPARATOR . '~' . $data['name'] . '~.php'))
+        {
+            return $folder . DIRECTORY_SEPARATOR . '~' . $data['name'] . '~';
+        }
+
+        if (!file_exists($folder))
+        {
+            return false;
+        }
+
+        $files     = scandir($folder);
+        $view_name = null;
+
+        foreach ($files as $file)
+        {
+            $filename = $folder . DIRECTORY_SEPARATOR . $file;
+            $pregtrue = preg_match('~\.php~i', $filename);
+            if ($file !== '.' && $file != '..' && $file != '__static_view.php' && $file !== $data['name'] . '.php' && is_file($filename) && $pregtrue === 1)
+            {
+                $view_name = $folder . DIRECTORY_SEPARATOR . str_replace('.php', '', $file);
+                break;
+            }
+        }
+
+        return $view_name;
     }
 
     /**
@@ -741,7 +731,7 @@ class Modules extends \Autoload
      * ВНИМАНИЕ!!!! Если добавить до этого запроса, в модуль блок, не из его init методов,
      * а просто со стороны, то не вернет вид! Поэтому нкжно передавать массив модулей! вторым параметром
      *
-     * @param MBCMS\module $module
+     * @param \MBCMS\module|Module $module
      * @param array $connect_modules - только модулям в массиве нужно устанавливать позицию __cms_module_position
      * @return view
      */
@@ -790,19 +780,24 @@ class Modules extends \Autoload
     {
         self::$ALL_THIS_CONNECTION_GET_NUMB++;
 
+        \MBCMS\Site::START();
 
         if (is_array($modules))
         {
             foreach ($modules as $module)
             {
+                \MBCMS\Site::START();
                 $mc = new ModuleCreater();
                 $mc->connect_module($module);
+                \MBCMS\Site::END('modele creater and connect 1');
             }
         }
         elseif (is_object($modules))
         {
+            \MBCMS\Site::START();
             $mc = new ModuleCreater();
             $mc->connect_module($modules);
+            \MBCMS\Site::END('modele creater and connect');
         }
 
 
@@ -811,6 +806,8 @@ class Modules extends \Autoload
             self::$ALL_THIS_CONNECTION_GET_NUMB--;
             self::post_connect_actions();
         }
+
+        \MBCMS\Site::END('get');
     }
 
     private static function post_connect_actions()
@@ -911,9 +908,9 @@ class Modules extends \Autoload
      * Формирует массив с данными о шаблоне модуле
      *
      * @param int $idTemplate ID шаблона
-     * @param boolean $view если true - вернет только вид модуля, который можно выводить через echo.
-     * усли false - вернет массив, с данными по модулю, его видом, и информацией из базы данных
      * @return type
+     * @internal param bool $view если true - вернет только вид модуля, который можно выводить через echo.
+     * усли false - вернет массив, с данными по модулю, его видом, и информацией из базы данных
      */
     public static function get_template($idTemplate = null)
     {
