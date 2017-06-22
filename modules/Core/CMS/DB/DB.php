@@ -7,25 +7,26 @@ class DB
 
     const M_USE_VALUE_BY_KEY = 'M_USE_VALUE_BY_KEY';
     protected static $conf;
-    private static $TIMER   = 0;
-    private static $QUERIES = 0;
-    protected        $__mysqli      = null;
-    protected        $__sql         = '';
-    protected        $__last_sql    = '';
-    protected        $__params      = [];
-    protected        $__smtm        = null;
-    protected        $__is_array    = false;
-    protected        $__is_mono     = false;
-    protected        $__limit       = null;
-    protected        $__offset      = null;
-    protected        $__select      = [];
-    protected        $__update      = [];
-    protected        $__joins       = [];
-    protected        $__ljoins      = [];
-    protected        $__whereSys    = [];
-    protected        $__whereSys_wc = false;
-    protected        $__order       = '';
-    protected        $__group       = '';
+    private static   $TIMER          = 0;
+    private static   $QUERIES        = 0;
+    protected        $__mysqli       = null;
+    protected        $__sql          = '';
+    protected        $__last_sql     = '';
+    protected        $__params       = [];
+    protected        $__smtm         = null;
+    protected        $__is_array     = false;
+    protected        $__is_mono      = false;
+    protected        $__limit        = null;
+    protected        $__offset       = null;
+    protected        $__select       = [];
+    protected        $__update       = [];
+    protected        $__joins        = [];
+    protected        $__ljoins       = [];
+    protected        $__whereSys     = [];
+    protected        $__analise_data = [];
+    protected        $__whereSys_wc  = false;
+    protected        $__order        = '';
+    protected        $__group        = '';
 
     public function __construct($sql, $params_array = [])
     {
@@ -47,6 +48,14 @@ class DB
     public static function d($table_name)
     {
         return new DB("DELETE FROM $table_name");
+    }
+
+    /**
+     * @return array times and queries
+     */
+    public static function get_info()
+    {
+        return [self::$TIMER, self::$QUERIES];
     }
 
     /**
@@ -251,209 +260,6 @@ class DB
         return $result;
     }
 
-    /**
-     * @return mixed
-     */
-    private function __query()
-    {
-        $ttttttttttt = microtime_float();
-
-
-        $this->__mysqli();
-
-        if ($this->__smtm = $this->__mysqli->prepare($this->__sql))
-        {
-
-            $this->__last_sql = $this->__sql;
-
-            $params = [];
-            $idents = null;
-
-            if ($idents = $this->__get_idents())
-            {
-                $params = [$idents];
-            }
-
-            $params = array_merge($params, $this->__params);
-
-            if ($params && $idents)
-            {
-                $refs = [];
-                foreach ($params as $key => $value)
-                {
-                    if ($value === null || is_array($value) || is_object($value))
-                    {
-                        $params[$key] = '';
-                    }
-
-                    $refs[] = &$params[$key];
-                }
-
-                call_user_func_array([$this->__smtm, 'bind_param'], $refs);
-            }
-
-            $this->__smtm->execute();
-
-            $results = $this->__get_result();
-
-            if (isset($this->__mysqli->insert_id) && $this->__mysqli->insert_id)
-            {
-                $results = $this->__mysqli->insert_id;
-            }
-
-            $this->__smtm->close();
-            $this->__mysqli->close();
-
-            unset($this->__smtm);
-            unset($this->__mysqli);
-
-            self::$TIMER += microtime_float($ttttttttttt, 'time', false);
-            self::$QUERIES .= $this->get_result_sql() . "\n\n\n";
-
-            return $results;
-        }
-        else
-        {
-            $er = $this->__mysqli->error ? $this->__mysqli->error : 'NO CONNECT. See Database config';
-
-            if (configuration::factory()->is_static_templates() !== true)
-            {
-                /* MDS */
-                echo '<pre class="btn-inverse">';
-                echo 'SQL error: ' . $er;
-                echo '<br/>';
-                echo $this->__sql;
-                echo '<br/>';
-                echo '======================================================================== ';
-                echo '</pre>'; /* MDS */
-
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @return array times and queries
-     */
-    public static function get_info()
-    {
-        return [self::$TIMER, self::$QUERIES];
-    }
-
-    private function __mysqli()
-    {
-        $this->__mysqli = new \mysqli(self::$conf['host'], self::$conf['username'], self::$conf['password'], self::$conf['database']);
-    }
-
-    private function __get_idents()
-    {
-        $idents = '';
-
-        foreach ($this->__params as $param)
-        {
-
-            if (is_string($param))
-            {
-                $idents .= 's';
-            }
-            else if (is_int($param))
-            {
-
-                $idents .= 'i';
-            }
-            else if (is_float($param))
-            {
-
-                $idents .= 'd';
-            }
-            else
-            {
-                $idents .= 's';
-            }
-        }
-
-        return $idents;
-    }
-
-    private function __get_result()
-    {
-        $meta       = $this->__smtm->result_metadata();
-        $results    = [];
-        $parameters = [];
-
-        if (method_exists($meta, 'fetch_field'))
-        {
-            while ($field = $meta->fetch_field())
-            {
-                $parameters[] = &$row[$field->name];
-            }
-        }
-
-        if ($parameters && count($parameters))
-        {
-            call_user_func_array([$this->__smtm, 'bind_result'], $parameters);
-        }
-
-        while ($this->__smtm->fetch())
-        {
-            $x = [];
-
-            foreach ($row as $key => $val)
-            {
-                $x[$key] = $val;
-            }
-
-            if (!$this->__is_array)
-            {
-                $x = (object)$x;
-            }
-
-            $results[] = $x;
-        }
-
-        return $this->__mono($results);
-    }
-
-    private function __mono($results)
-    {
-        if ($this->__is_mono && count($results) == 1)
-        {
-            return array_shift($results);
-        }
-        else if (count($results) > 1 && $this->__is_mono)
-        {
-            return $results;
-        }
-        else if ($this->__is_mono && !count($results))
-        {
-            return null;
-        }
-
-        return $results;
-    }
-
-    /**
-     * @return string
-     */
-    public function get_result_sql()
-    {
-        if ($this->__sql)
-        {
-            return $this->__sql;
-        }
-        $this->__clear();
-        $this->__merged();
-
-        return $this->__sql;
-    }
-
-    private function __clear()
-    {
-        $this->__sql    = '';
-        $this->__params = [];
-    }
-
     private function __merged()
     {
         $this->__merge_select();
@@ -461,9 +267,13 @@ class DB
         $this->__merge_joins();
         $this->__merge_update_step2();
         $this->__merge_where();
-        $this->__merge_group();
-        $this->__merge_order();
-        $this->__merge_limit();
+
+        if (!$this->__merge_procedure_analise())
+        {
+            $this->__merge_group();
+            $this->__merge_order();
+            $this->__merge_limit();
+        }
     }
 
     private function __merge_select()
@@ -711,9 +521,238 @@ class DB
         }
     }
 
+    private function __merge_procedure_analise()
+    {
+        if (count($this->__analise_data))
+        {
+            list($limit_rows, $limit_memory) = $this->__analise_data;
+            $this->r("PROCEDURE ANALYSE ($limit_rows, $limit_memory)");
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function __query()
+    {
+        $ttttttttttt = microtime_float();
+
+
+        $this->__mysqli();
+
+        if ($this->__smtm = $this->__mysqli->prepare($this->__sql))
+        {
+
+            $this->__last_sql = $this->__sql;
+
+            $params = [];
+            $idents = null;
+
+            if ($idents = $this->__get_idents())
+            {
+                $params = [$idents];
+            }
+
+            $params = array_merge($params, $this->__params);
+
+            if ($params && $idents)
+            {
+                $refs = [];
+                foreach ($params as $key => $value)
+                {
+                    if ($value === null || is_array($value) || is_object($value))
+                    {
+                        $params[$key] = '';
+                    }
+
+                    $refs[] = &$params[$key];
+                }
+                call_user_func_array([$this->__smtm, 'bind_param'], $refs);
+            }
+
+            $this->__smtm->execute();
+
+            $results = $this->__get_result();
+
+            if (isset($this->__mysqli->insert_id) && $this->__mysqli->insert_id)
+            {
+                $results = $this->__mysqli->insert_id;
+            }
+
+            $this->__smtm->close();
+            $this->__mysqli->close();
+
+            unset($this->__smtm);
+            unset($this->__mysqli);
+
+            self::$TIMER += microtime_float($ttttttttttt, 'time', false);
+            self::$QUERIES .= $this->get_result_sql() . "\n\n\n";
+
+            return $results;
+        }
+        else
+        {
+            $er = $this->__mysqli->error ? $this->__mysqli->error : 'NO CONNECT. See Database config';
+
+            if (configuration::factory()->is_static_templates() !== true)
+            {
+                /* MDS */
+                echo '<pre class="btn-inverse">';
+                echo 'SQL error: ' . $er;
+                echo '<br/>';
+                echo $this->__sql;
+                echo '<br/>';
+                echo '======================================================================== ';
+                echo '</pre>'; /* MDS */
+
+            }
+        }
+
+        return null;
+    }
+
+    private function __mysqli()
+    {
+        $this->__mysqli = new \mysqli(self::$conf['host'], self::$conf['username'], self::$conf['password'], self::$conf['database']);
+    }
+
+    private function __get_idents()
+    {
+        $idents = '';
+
+        foreach ($this->__params as $param)
+        {
+
+            if (is_string($param))
+            {
+                $idents .= 's';
+            }
+            else if (is_int($param))
+            {
+
+                $idents .= 'i';
+            }
+            else if (is_float($param))
+            {
+
+                $idents .= 'd';
+            }
+            else
+            {
+                $idents .= 's';
+            }
+        }
+
+        return $idents;
+    }
+
+    private function __get_result()
+    {
+        $meta       = $this->__smtm->result_metadata();
+        $results    = [];
+        $parameters = [];
+
+        if (method_exists($meta, 'fetch_field'))
+        {
+            while ($field = $meta->fetch_field())
+            {
+                $parameters[] = &$row[$field->name];
+            }
+        }
+
+        if ($parameters && count($parameters))
+        {
+            call_user_func_array([$this->__smtm, 'bind_result'], $parameters);
+        }
+
+        while ($this->__smtm->fetch())
+        {
+            $x = [];
+
+            foreach ($row as $key => $val)
+            {
+                $x[$key] = $val;
+            }
+
+            if (!$this->__is_array)
+            {
+                $x = (object)$x;
+            }
+
+            $results[] = $x;
+        }
+
+        return $this->__mono($results);
+    }
+
+    private function __mono($results)
+    {
+        if ($this->__is_mono && count($results) == 1)
+        {
+            return array_shift($results);
+        }
+        else if (count($results) > 1 && $this->__is_mono)
+        {
+            return $results;
+        }
+        else if ($this->__is_mono && !count($results))
+        {
+            return null;
+        }
+
+        return $results;
+    }
+
+    /**
+     * @return string
+     */
+    public function get_result_sql()
+    {
+        if ($this->__sql)
+        {
+            return $this->__sql;
+        }
+        $this->__clear();
+        $this->__merged();
+
+        return $this->__sql;
+    }
+
+    private function __clear()
+    {
+        $this->__sql    = '';
+        $this->__params = [];
+    }
+
+    /**
+     * @param int $limit_rows
+     * @param int $limit_memory
+     * @return $this
+     */
+    public function analise($limit_rows = 5, $limit_memory = 2000)
+    {
+        $this->__analise_data = [$limit_rows, $limit_memory];
+
+        return $this;
+    }
+
+    public function one()
+    {
+
+        $this->limit(1);
+        $this->is_mono();
+
+        return $this->get();
+    }
+
     /**
      * DB::q()->w('uname = ?', 'lol2')->save(['uname' => 'admin2'], 't_admins');
      * Нельзя сохранять null! поля со значением нулл будут удалены! И просто не будут перезаписаны;
+     * ->w - нужно для поиска ключей, чтобы не создавать их по новой
      *
      * DB::q()->save([], 't_all_cities'); - add new
      *
@@ -751,6 +790,7 @@ class DB
     /**
      *
      * @param \MBCMS\DB $query
+     * @return $this
      */
     public function merge(DB $query)
     {
