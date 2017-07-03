@@ -13,7 +13,7 @@ event.site.form.success = function ()
 {
     this.__key = 'event.site.form.success'; // уникальный идентификатор, прсто название класса!
     this.form = null;
-    this.msg = null;
+    this.msg = null;    
     this.action = null;
     this.form_id = null;
     this.action_method = null;
@@ -175,6 +175,7 @@ site.form = function ()
 
         if (before.__abort)
         {
+            site.form.enable_form_button_by_form(form);
             return;
         }
 
@@ -251,6 +252,7 @@ site.form.prototype.init = function (jq_form)
         .find('[type=submit]')
         .click(function ()
         {
+
             if (!$(this).hasClass('disable'))
             {
                 site.form.disable_form_button($(this));
