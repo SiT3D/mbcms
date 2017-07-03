@@ -2,7 +2,6 @@
 
 namespace MBCMS\Forms\OPT;
 
-use phpDocumentor\Reflection\Types\Null_;
 
 class main_option extends \Module
 {
@@ -130,11 +129,11 @@ class main_option extends \Module
             return;
         }
 
-
-        preg_match('~[a-zA-Z%\-]+~', $this->value, $mathes);
+        preg_match('~[^\-^\d]+[a-zA-Z\-]+~', $this->value, $mathes);
         $this->metrica = isset($mathes[0]) ? $mathes[0] : '';
-        preg_match('~[\d\.]*~', $this->value, $mathes);
+        preg_match('~^\-?[\d\.]+~', $this->value, $mathes);
         $this->value = isset($mathes[0]) ? $mathes[0] : '';
+
 
         if (!in_array($this->metrica, $this->metrix))
         {
