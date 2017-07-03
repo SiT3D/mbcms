@@ -317,7 +317,7 @@ class image_galary extends \Module implements \adminAjax
     }
 
     /**
-     * @param $tags
+     * @param $tags  DEPRICATED => find_by_tags_width_image
      * @return string
      */
     public function get_image_src_by_tags($tags)
@@ -385,6 +385,78 @@ class image_galary extends \Module implements \adminAjax
         {
             return '';
         }
+    }
+
+    /**
+     * @param array $tags
+     * @return array
+     */
+    public function find_by_tags_width_image(array $tags)
+    {
+        $query = DB::q();
+
+        $select = [];
+        $i      = 0;
+
+        foreach ($tags as $key => $tag)
+        {
+            $select[$i] = 't_images_tags as t' . $i;
+            $query->w("(t$i.name = ? AND t$i.value = ?)", [$key, $tag]);
+            $i++;
+        }
+
+        $query->s(['*', 't0.name as tag_name'], implode(',', $select))->j('t_images', 't_images.id = t0.image_id');
+
+        $images = $query->get();
+
+
+        foreach ($images as $image)
+        {
+            $image->src = '/' . image_galary::FOLDER_NAME . $image->dir;
+        }
+
+        return $images;
+    }
+
+    /**
+     * @param array $multitags - массив с массивами тагов [[tag=>a], [tag=>b, tag=>c]]
+     * @return array
+     */
+    public function find_by_multitags_width_image(array $multitags)
+    {
+        $query = DB::q();
+
+
+        $select = [];
+
+        foreach ($multitags as $tags)
+        {
+            $i = 0;
+
+            foreach ($tags as $key => $tag)
+            {
+                $select[$i] = 't_images_tags as t' . $i;
+                $query->w("(t$i.name = ? AND t$i.value = ?)", [$key, $tag], 'OR');
+                $i++;
+            }
+
+        }
+
+        if (!count($select))
+        {
+            return [];
+        }
+
+        $query->s(['*', 't0.name as tag_name'], implode(',', $select))->j('t_images', 't_images.id = t0.image_id');
+
+        $images = $query->get();
+
+        foreach ($images as $image)
+        {
+            $image->src = '/' . image_galary::FOLDER_NAME . $image->dir;
+        }
+
+        return $images;
     }
 
 }
