@@ -132,6 +132,7 @@ class Module extends Autoload
      */
     public static function generate_php_template($idTemplate, $templateData)
     {
+
         if (!isset($templateData['idTemplate']) || !isset($templateData['name']))
         {
             return;
@@ -148,9 +149,8 @@ class Module extends Autoload
         $templateData['title']        = $templateData['title'] ? $templateData['title'] : 'Новый шаблон';
         $templateData['path']         = $templateData['path'] ? $templateData['path'] : '';
 
-        GClass::getClassInfo(self::STANDART_TEMPLATE_NAMESPACE . $idTemplate);
 
-        $folder       = GClass::$classInfo['folder'];
+        $folder = HOME_PATH . DIRECTORY_SEPARATOR . "modules" . DIRECTORY_SEPARATOR . "templates" . DIRECTORY_SEPARATOR . $idTemplate;
         $template_php = $folder . DIRECTORY_SEPARATOR . $idTemplate . '.php';
 
         if (!file_exists($folder))
@@ -960,7 +960,6 @@ class Module extends Autoload
      *
      * and after init
      *
-     * and in init
      * if (isset($this->__mod) && $this->__mod)
      * {
      * $this->__mod->clear_id();
@@ -1020,7 +1019,7 @@ class Module extends Autoload
      * Полезно если нужно вывести много шаблонов подряд, просто подставляя туда данные.
      * Работает в 10-100 раз быстрее чем полное подключение модуля.
      *
-     * Методы init; after_init; preview; не будут вызваны
+     * Методы init; after_init; preview; не будут вызваны поэтому к такому модулю нельзя подключить другой модуль!
      */
     public function ignore_logic()
     {
@@ -1169,6 +1168,8 @@ class Module extends Autoload
         $this->THIS_CONNECTION_PARENT_ID = null;
         $this->THIS_CONNECTION_MODULE_ID = null;
         \Modules::add_main_module($this);
+
+        return $this;
     }
 
     public function view_prioritet_index($prioritet = null, $range = 9999)
