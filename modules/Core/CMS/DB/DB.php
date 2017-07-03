@@ -8,7 +8,8 @@ class DB
     const M_USE_VALUE_BY_KEY = 'M_USE_VALUE_BY_KEY';
     protected static $conf;
     private static   $TIMER          = 0;
-    private static   $QUERIES        = 0;
+    private static   $QUERIES        = '';
+    private static   $QUERIES_COUNT  = 0;
     protected        $__mysqli       = null;
     protected        $__sql          = '';
     protected        $__last_sql     = '';
@@ -27,6 +28,7 @@ class DB
     protected        $__whereSys_wc  = false;
     protected        $__order        = '';
     protected        $__group        = '';
+    protected        $__sql_no_cache = false;
 
     public function __construct($sql, $params_array = [])
     {
@@ -55,196 +57,58 @@ class DB
      */
     public static function get_info()
     {
-        return [self::$TIMER, self::$QUERIES];
+        return [self::$TIMER, self::$QUERIES, self::$QUERIES_COUNT];
     }
 
-    /**
-     *
-     * @param $table
-     * @param $regularOn
-     * @param array $values
-     * @return \MBCMS\DB
-     */
-    public function lj($table, $regularOn, $values = [])
+    public static function get_tables($database_name = null, $is_string = true)
     {
-        $this->__ljoins[] = [
-            't' => $table,
-            'r' => $regularOn,
-            'v' => $values,
-        ];
+        $database_name = $database_name ? $database_name : configuration::factory()->get_db_config()['database'];
+        $tables        = DB::q("SHOW TABLES FROM {$database_name}")->get();
 
-        return $this;
-    }
-
-    /**
-     *
-     * @param string $table
-     * @param string $regularOn example user.id = vacancy.userid (без ON )
-     * @param array $values
-     * @return \MBCMS\DB
-     */
-    public function j($table, $regularOn, $values = [])
-    {
-        $this->__joins[] = [
-            't' => $table,
-            'r' => $regularOn,
-            'v' => $values,
-        ];
-
-        return $this;
-    }
-
-    /**
-     * Разновидность where тот же массив но другие параметры, и тип + другой мердж через ->m
-     */
-    public function in()
-    {
-
-    }
-
-    /**
-     * Использовать в сочетании с w() для взятия выражения в скобки. Пример id = 1 AND(a=1 OR a=2)
-     *
-     * ->w('id = 1')
-     * ->wc('L', 'AND')
-     * ->w('a=1')
-     * ->w('a=2', 'OR')
-     * ->wc('R', '')
-     *
-     * @param $pos = L or R
-     * @param string $operator AND|OR
-     * @return \MBCMS\DB
-     */
-    public function wc($pos, $operator)
-    {
-        if (strtoupper($pos) === 'L')
+        if ($is_string)
         {
-            $this->__whereSys[]  = [$operator, '(', []];
-            $this->__whereSys_wc = true;
-        }
-        else if (strtoupper($pos) === 'R')
-        {
-            $this->__whereSys[]  = [')', $operator, []];
-            $this->__whereSys_wc = false;
+            $string = '';
 
-            $prev = isset($this->__whereSys[count($this->__whereSys) - 2]) ? $this->__whereSys[count($this->__whereSys) - 2] : null;
-            if (isset($prev[1]) && $prev[1] === '(')
+            foreach ($tables as $table)
             {
-                unset($this->__whereSys[count($this->__whereSys) - 2]);
-                unset($this->__whereSys[count($this->__whereSys)]);
+                $string .= '<br>' . $table->{'Tables_in_' . $database_name};
+            }
+
+            return $string;
+        }
+        else
+        {
+            return $tables;
+        }
+    }
+
+    public static function db_optimization()
+    {
+        $tables = DB::get_tables(null, false);
+
+        foreach ($tables as $table)
+        {
+            $table   = $table->Tables_in_trudOe;
+            $analise = DB::q()->s(['*'], $table)->analise(1,1)->get();
+            $current = DB::get_table_columns($table)[$table];
+
+
+            echo "<h1>$table</h1>";
+
+            echo '<br><br>';
+
+            foreach ($analise as $index => $item)
+            {
+                $__current       = $current[$index];
+                $__current->Null = $__current->Null ? 'NOT NULL' : 'NULL';
+                $__current->Type = strtoupper($__current->Type);
+                if ($item->Optimal_fieldtype !== "$__current->Type $__current->Null")
+                {
+                    echo "{$item->Field_name} {$item->Optimal_fieldtype} === {$__current->Type} {$__current->Null}<br><br>";
+                }
             }
         }
 
-        return $this;
-    }
-
-    /**
-     *
-     * @param $sql NO WORDS GROUP BY
-     * @return \MBCMS\DB
-     */
-    public function g($sql)
-    {
-        $this->__group = $sql;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $value
-     * @return $this
-     */
-    public function is_array($value = true)
-    {
-        $this->__is_array = $value;
-
-        return $this;
-    }
-
-    /**
-     * Можно получить после сборки запроса ->get() или ->get_result_sql
-     *
-     * @return array
-     */
-    public function get_params_array()
-    {
-        return $this->__params;
-    }
-
-    public function count($is_mono = true)
-    {
-        $count_query = clone $this;
-        $count_query->s(['count(*) as count'])->is_mono($is_mono)->limit(null)->offset(null)->o('');
-        $qc = $count_query->get();
-
-        return isset($qc->count) ? $qc->count : (is_array($qc) ? count($qc) : 0);
-    }
-
-    /**
-     *
-     * @param $sql NO WORDS ORDER BY
-     * @return \MBCMS\DB
-     */
-    public function o($sql)
-    {
-        $this->__order = $sql;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @param int $value ->offset(),->limit()
-     * @return $this
-     */
-    public function offset($value)
-    {
-        $this->__offset = $value;
-
-        return $this;
-    }
-
-    /**
-     *
-     * @param int $value ->offset(),->limit()
-     * @return $this
-     */
-    public function limit($value)
-    {
-        $this->__limit = $value;
-
-        return $this;
-    }
-
-    /**
-     * Если результатом запроса является массив с 1 записью, то вернет не массив а только эту запись.
-     * Но даже если указан этот параметр, но массив вернется с несколькими записями, то данное действие будет проигнорировано.
-     * Для верного результата можно использовать в сочетвнии с limit(1)
-     * @param bool $value
-     * @return $this or null
-     */
-    public function is_mono($value = true)
-    {
-        $this->__is_mono = $value;
-
-        return $this;
-    }
-
-    /**
-     *
-     * // Добавить метод, добавляющий в селект group_concat(t_images_tags.value separator ',') as mytags
-     *
-     * @param array $columns индексный массив строк
-     * @param string $table_name
-     * @param bool $is_merge_columns = false
-     * @return \MBCMS\DB
-     */
-    public function s(array $columns, $table_name = null, $is_merge_columns = false)
-    {
-        $this->__select[0] = isset($this->__select[0]) && $this->__select[0] ? $this->__select[0] : $table_name;
-        $this->__select[1] = $is_merge_columns ? array_merge($columns, (isset($this->__select[1]) ? $this->__select[1] : [])) : $columns;
-
-        return $this;
     }
 
     /**
@@ -253,11 +117,20 @@ class DB
     public function get()
     {
 
+        $this->sql_no_cache(); // DEL its test from Pavel
+
         $this->__merged();
         $result = $this->__query();
         $this->__clear();
 
         return $result;
+    }
+
+    public function sql_no_cache()
+    {
+        $this->__sql_no_cache = true;
+
+        return $this;
     }
 
     private function __merged()
@@ -284,6 +157,8 @@ class DB
         }
 
         list($table_name, $columns) = $this->__select;
+        $columns[0] = isset($columns[0]) && $this->__sql_no_cache ? 'SQL_NO_CACHE ' . $columns[0] : $columns[0];
+
         $columns = implode(",\n", $columns);
         $this->r("SELECT $columns FROM $table_name");
     }
@@ -493,6 +368,19 @@ class DB
         }
     }
 
+    private function __merge_procedure_analise()
+    {
+        if (count($this->__analise_data))
+        {
+            list($limit_rows, $limit_memory) = $this->__analise_data;
+            $this->r("PROCEDURE ANALYSE ($limit_rows, $limit_memory)");
+
+            return true;
+        }
+
+        return false;
+    }
+
     private function __merge_group()
     {
         if ($this->__group)
@@ -521,26 +409,12 @@ class DB
         }
     }
 
-    private function __merge_procedure_analise()
-    {
-        if (count($this->__analise_data))
-        {
-            list($limit_rows, $limit_memory) = $this->__analise_data;
-            $this->r("PROCEDURE ANALYSE ($limit_rows, $limit_memory)");
-
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * @return mixed
      */
     private function __query()
     {
         $ttttttttttt = microtime_float();
-
 
         $this->__mysqli();
 
@@ -589,8 +463,28 @@ class DB
             unset($this->__smtm);
             unset($this->__mysqli);
 
-            self::$TIMER += microtime_float($ttttttttttt, 'time', false);
-            self::$QUERIES .= $this->get_result_sql() . "\n\n\n";
+            $current_time     = microtime_float($ttttttttttt, 'sql query time', false);
+            $current_bugtrace = '';
+
+            $i = 5;
+            foreach (debug_backtrace() as $item)
+            {
+
+                if (isset($item['file']))
+                {
+                    $current_bugtrace .= "\n file: {$item['file']}; line: {$item['line']}";
+                }
+
+                $i--;
+                if (!$i)
+                {
+                    break;
+                }
+            }
+
+            self::$TIMER += $current_time;
+            self::$QUERIES .= $this->get_result_sql() . "\n" . json_encode($this->get_params_array()) . "\n\n $current_time \n\n $current_bugtrace" . "\n\n\n\n";
+            self::$QUERIES_COUNT++;
 
             return $results;
         }
@@ -598,13 +492,37 @@ class DB
         {
             $er = $this->__mysqli->error ? $this->__mysqli->error : 'NO CONNECT. See Database config';
 
-            if (configuration::factory()->is_static_templates() !== true)
+            if (configuration::factory()->is_dev_mod() && configuration::factory()->is_superadmin())
             {
+                $tables = [$this->__select[0]];
+
+                foreach ($this->__joins as $j)
+                {
+                    $tables[] = $j['t'];
+                }
+
+                foreach ($this->__ljoins as $j)
+                {
+                    $tables[] = $j['t'];
+                }
+
+                $columns_all = self::get_table_columns($tables);
+
                 /* MDS */
                 echo '<pre class="btn-inverse">';
                 echo 'SQL error: ' . $er;
                 echo '<br/>';
                 echo $this->__sql;
+                echo '<br><br><br>';
+                foreach ($columns_all as $table_name => $columns)
+                {
+                    echo '<br>' . $table_name . '<br>';
+                    foreach ($columns as $column)
+                    {
+                        echo "<pre>{$column->Field} ($column->Type);</pre>";
+                    }
+                }
+                echo self::get_tables();
                 echo '<br/>';
                 echo '======================================================================== ';
                 echo '</pre>'; /* MDS */
@@ -655,6 +573,7 @@ class DB
         $meta       = $this->__smtm->result_metadata();
         $results    = [];
         $parameters = [];
+
 
         if (method_exists($meta, 'fetch_field'))
         {
@@ -726,6 +645,248 @@ class DB
     {
         $this->__sql    = '';
         $this->__params = [];
+    }
+
+    /**
+     * Можно получить после сборки запроса ->get() или ->get_result_sql
+     *
+     * @return array
+     */
+    public function get_params_array()
+    {
+        return $this->__params;
+    }
+
+    /**
+     * @param $table_names
+     * @param bool $is_string
+     * @return array
+     */
+    public static function get_table_columns($table_names)
+    {
+        $result = [];
+
+        $table_names = is_array($table_names) ? $table_names : [$table_names];
+
+        foreach ($table_names as $table_name)
+        {
+            $result[$table_name] = DB::q("SHOW COLUMNS FROM {$table_name}")->get();
+        }
+
+
+        return $result;
+    }
+
+    /**
+     * @param string $sql
+     * @param array $params_array
+     * @return DB
+     */
+    public static function q($sql = '', $params_array = [])
+    {
+        return new DB($sql, $params_array);
+    }
+
+    /**
+     *
+     * @param $table
+     * @param $regularOn
+     * @param array $values
+     * @return \MBCMS\DB
+     */
+    public function lj($table, $regularOn, $values = [])
+    {
+        $this->__ljoins[] = [
+            't' => $table,
+            'r' => $regularOn,
+            'v' => $values,
+        ];
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param string $table
+     * @param string $regularOn example user.id = vacancy.userid (без ON )
+     * @param array $values
+     * @return \MBCMS\DB
+     */
+    public function j($table, $regularOn, $values = [])
+    {
+        $this->__joins[] = [
+            't' => $table,
+            'r' => $regularOn,
+            'v' => $values,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Разновидность where тот же массив но другие параметры, и тип + другой мердж через ->m
+     * @param $key_in t_table.id
+     * @param $array_values [1,2,3,4]
+     * @param string $operator = AND
+     * @return $this
+     */
+    public function in($key_in, $array_values, $operator = 'AND')
+    {
+        $string_values = implode(',', $array_values);
+        $this->w("{$key_in} IN ($string_values)", [], $operator);
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param string $regular
+     * @param array $values
+     * @param string $operator
+     * @return \MBCMS\DB
+     */
+    public function w($regular, $values = [], $operator = 'AND')
+    {
+        $operator            = $this->__whereSys_wc ? '' : $operator;
+        $this->__whereSys_wc = false;
+        $this->__whereSys[]  = [$operator, $regular, $values];
+
+        return $this;
+    }
+
+    /**
+     * Использовать в сочетании с w() для взятия выражения в скобки. Пример id = 1 AND(a=1 OR a=2)
+     *
+     * ->w('id = 1')
+     * ->wc('L', 'AND')
+     * ->w('a=1')
+     * ->w('a=2', 'OR')
+     * ->wc('R', '')
+     *
+     * @param $pos = L or R
+     * @param string $operator AND|OR
+     * @return \MBCMS\DB
+     */
+    public function wc($pos, $operator)
+    {
+        if (strtoupper($pos) === 'L')
+        {
+            $this->__whereSys[]  = [$operator, '(', []];
+            $this->__whereSys_wc = true;
+        }
+        else if (strtoupper($pos) === 'R')
+        {
+            $this->__whereSys[]  = [')', $operator, []];
+            $this->__whereSys_wc = false;
+
+            $prev = isset($this->__whereSys[count($this->__whereSys) - 2]) ? $this->__whereSys[count($this->__whereSys) - 2] : null;
+            if (isset($prev[1]) && $prev[1] === '(')
+            {
+                unset($this->__whereSys[count($this->__whereSys) - 2]);
+                unset($this->__whereSys[count($this->__whereSys)]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param $sql NO WORDS GROUP BY
+     * @return \MBCMS\DB
+     */
+    public function g($sql)
+    {
+        $this->__group = $sql;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function is_array($value = true)
+    {
+        $this->__is_array = $value;
+
+        return $this;
+    }
+
+    public function count($is_mono = true)
+    {
+        $count_query = clone $this;
+        $count_query->s(['count(*) as count'])->is_mono($is_mono)->limit(null)->offset(null)->o('');
+        $qc = $count_query->get();
+
+        return isset($qc->count) ? $qc->count : (is_array($qc) ? count($qc) : 0);
+    }
+
+    /**
+     *
+     * @param $sql NO WORDS ORDER BY
+     * @return \MBCMS\DB
+     */
+    public function o($sql)
+    {
+        $this->__order = $sql;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param int $value ->offset(),->limit()
+     * @return $this
+     */
+    public function offset($value)
+    {
+        $this->__offset = $value;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param int $value ->offset(),->limit()
+     * @return $this
+     */
+    public function limit($value)
+    {
+        $this->__limit = $value;
+
+        return $this;
+    }
+
+    /**
+     * Если результатом запроса является массив с 1 записью, то вернет не массив а только эту запись.
+     * Но даже если указан этот параметр, но массив вернется с несколькими записями, то данное действие будет проигнорировано.
+     * Для верного результата можно использовать в сочетвнии с limit(1)
+     * @param bool $value
+     * @return $this or null
+     */
+    public function is_mono($value = true)
+    {
+        $this->__is_mono = $value;
+
+        return $this;
+    }
+
+    /**
+     *
+     * // Добавить метод, добавляющий в селект group_concat(t_images_tags.value separator ',') as mytags
+     *
+     * @param array $columns индексный массив строк
+     * @param string $table_name
+     * @param bool $is_merge_columns = false
+     * @return \MBCMS\DB
+     */
+    public function s(array $columns, $table_name = null, $is_merge_columns = false)
+    {
+        $this->__select[0] = isset($this->__select[0]) && $this->__select[0] ? $this->__select[0] : $table_name;
+        $this->__select[1] = $is_merge_columns ? array_merge($columns, (isset($this->__select[1]) ? $this->__select[1] : [])) : $columns;
+
+        return $this;
     }
 
     /**
@@ -813,16 +974,6 @@ class DB
     }
 
     /**
-     * @param string $sql
-     * @param array $params_array
-     * @return DB
-     */
-    public static function q($sql = '', $params_array = [])
-    {
-        return new DB($sql, $params_array);
-    }
-
-    /**
      *
      * @param array $set_array ['column_name' => value]
      * @param $table_name
@@ -859,19 +1010,53 @@ class DB
         return $db;
     }
 
-    /**
-     *
-     * @param string $regular
-     * @param array $values
-     * @param string $operator
-     * @return \MBCMS\DB
-     */
-    public function w($regular, $values = [], $operator = 'AND')
+    public function get_table_name()
     {
-        $operator            = $this->__whereSys_wc ? '' : $operator;
-        $this->__whereSys_wc = false;
-        $this->__whereSys[]  = [$operator, $regular, $values];
+        return isset($this->__select[0]) ? $this->__select[0] : '';
+    }
 
-        return $this;
+    /**
+     * Производит поиск в подключенных именах таблиц, по части слова
+     * части слов указываются как параметры. Затем склеиваются в регулярное выражение для поиска.
+     * Возвращает только первое сходство всегда 1 название таблицы
+     */
+    public function get_joins_table_name()
+    {
+        $params = func_get_args();
+
+        if (!count($params))
+        {
+            return;
+        }
+
+        $preg_string = "~";
+
+        foreach ($params as $param)
+        {
+            $param = trim($param);
+            if ($param)
+            {
+                $preg_string .= ".*$param";
+            }
+        }
+
+        $preg_string .= '~Usi';
+
+
+        foreach ($this->__joins as $join)
+        {
+            if (preg_match($preg_string, $join['t']))
+            {
+                return $join['t'];
+            }
+        }
+
+        foreach ($this->__ljoins as $join)
+        {
+            if (preg_match($preg_string, $join['t']))
+            {
+                return $join['t'];
+            }
+        }
     }
 }
