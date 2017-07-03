@@ -16,7 +16,7 @@ class cache
      * @var type // секунды на 1 единицу времени
      */
     private $__multiplicator = 60;  // считать его по выполнениям кеша суммировать только а не все время с другой логикой
-    private $__limit         = 0.035;
+    private $__limit         = 500;
     private $__key, $__life_time, $__force;
     private $__file          = null;
 
@@ -26,7 +26,7 @@ class cache
      * @param $life_time - время жизни в минутах
      * @param $force - игнорировать дату создания и жизни
      */
-    public function __construct($key, $life_time = 60, $force = false)
+    public function __construct($key, $life_time = 60, $force = true)
     {
         $this->__key       = $key;
         $this->__life_time = $life_time;
@@ -44,7 +44,7 @@ class cache
 
         if (!file_exists($dir))
         {
-            mkdir($dir);
+            mkdir($dir, 0777);
         }
 
         return $dir . DIRECTORY_SEPARATOR;
@@ -58,7 +58,7 @@ class cache
     {
         if (self::timer('remove_all_caches_files', 5, self::DAYS))
         {
-            files::remove_dir(self::__dir(), 3600 * 24 * 10); // удалить кеш старше 12 дней
+            files::remove_dir(self::__dir(), 3600 * 24 * 10);
         }
     }
 
@@ -72,7 +72,7 @@ class cache
     {
         $cache = new cache($unical_key, $time);
         $cache->set_multiplicator($multiplicator);
-        $rand = rand(0, 10000000000);
+        $rand = rand(0, 10000000000) * time();
         $true = $cache->result(function () use ($rand)
         {
             return $rand;
@@ -88,6 +88,8 @@ class cache
     public function set_multiplicator($val)
     {
         $this->__multiplicator = $val < 1 ? 1 : (int)$val;
+
+        return $this;
     }
 
     /**
