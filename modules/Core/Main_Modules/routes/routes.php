@@ -5,6 +5,7 @@ namespace MBCMS;
 use event\standart_security_login_event;
 use GetPost;
 
+
 class routes extends \Module
 {
 
@@ -56,6 +57,7 @@ class routes extends \Module
     {
         $className = GetPost::get('class');
         $redirect  = GetPost::get('redirect');
+
 
         $result = [];
         preg_match('~\->(.*)~', $className, $result);
@@ -255,6 +257,11 @@ class routes extends \Module
     private static function database_get_id($name_page)
     {
         $name_page = urldecode($name_page);
+
+        $name_page = preg_replace_callback('~/$~', function ()
+        {
+            return '';
+        }, $name_page);
 
         foreach (self::$__all_pages as $route_name => $page)
         {
