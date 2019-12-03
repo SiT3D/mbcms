@@ -23,4 +23,3 @@ foreach (\Modules::get_main_views() as $view)
 
 $log_timer = microtime_float($ttttttttttt, 'time', false);
 \MBCMS\Site::site_info_panel($log_timer);
-fgdfg dfg dfg dfg dfg
